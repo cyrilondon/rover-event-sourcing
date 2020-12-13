@@ -33,6 +33,15 @@
 	</properties>
 
 	<dependencies>
+	
+	    <!-- DTO application module -->
+		<dependency>
+			<groupId>com.cyrilondon</groupId>
+			<artifactId>rover-dto-axon</artifactId>
+			<version>HEAD</version>
+		</dependency>
+	
+	
 		<!-- Axon -->
 		<dependency>
 			<groupId>org.axonframework</groupId>

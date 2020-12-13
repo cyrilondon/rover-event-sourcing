@@ -9,7 +9,7 @@
         </layout>
     </appender>
 
-    <logger name="com.rover.domain" level="DEBUG" additivity="false">
+    <logger name="com.rover" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

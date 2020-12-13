@@ -10,7 +10,8 @@
     <name>Rover Project Event Sourcing</name>
 	
 	<modules>
-		<module>rover-model-axon</module>
+		<module>rover-dto-axon</module>	
+		<module>rover-model-axon</module>	
 	</modules>
 
     <properties></properties>
