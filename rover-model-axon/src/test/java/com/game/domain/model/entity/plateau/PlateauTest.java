@@ -7,9 +7,10 @@ import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.game.domain.model.exception.EntityValidationException;
-import com.game.domain.rover.api.PlateauInitializeCmd;
-import com.game.domain.rover.api.PlateauInitializedEvt;
+import com.rover.domain.api.PlateauInitializeCmd;
+import com.rover.domain.api.PlateauInitializedEvt;
+import com.rover.domain.model.entity.plateau.Plateau;
+import com.rover.domain.model.exception.EntityValidationException;
 
 public class PlateauTest {
 
