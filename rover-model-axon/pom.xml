@@ -35,11 +35,13 @@
 	<dependencies>
 	
 	    <!-- DTO application module -->
+	    <!--  
 		<dependency>
 			<groupId>com.cyrilondon</groupId>
 			<artifactId>rover-dto-axon</artifactId>
 			<version>HEAD</version>
 		</dependency>
+		-->
 	
 	
 		<!-- Axon -->
@@ -67,9 +69,23 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		
+		<!-- Spring Boot web for Rest endpoints -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+		<!-- Swagger -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.9.2</version>
 		</dependency>
 
 		<dependency>

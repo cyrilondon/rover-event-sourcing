@@ -68,7 +68,7 @@ public class Plateau implements TwoDimensionalSpace {
 		logger.debug("applying {}", evt);
 		id = evt.getId();
 		this.dimensions = new TwoDimensions(new TwoDimensionalCoordinates(evt.getWidth(), evt.getHeight()));
-		logger.debug("new plateau id: {} with width {} and height {}", this.id, this.dimensions.getWidth(), this.dimensions.getHeight());
+		logger.debug("new Plateau id: {} with width {} and height {}", this.id, this.dimensions.getWidth(), this.dimensions.getHeight());
 		this.status = PlateauStatus.ACTIVE;
 		initializeLocations();
 	}
