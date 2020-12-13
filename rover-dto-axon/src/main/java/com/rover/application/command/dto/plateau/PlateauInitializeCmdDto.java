@@ -2,19 +2,9 @@ package com.rover.application.command.dto.plateau;
 
 public class PlateauInitializeCmdDto {
 	
-	private String uuid;
-	
 	private int width;
 	
 	private int height;
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
 
 	public int getWidth() {
 		return width;
