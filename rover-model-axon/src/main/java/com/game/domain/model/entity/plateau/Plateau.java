@@ -32,6 +32,8 @@ public class Plateau implements TwoDimensionalSpace {
 
 	private TwoDimensionalSpace dimensions;
 	
+	private PlateauStatus status;
+	
 	private PlateauValidator plateauValidator = GameContext.getInstance().getPlateauValidator();
 
 	/**
@@ -68,6 +70,7 @@ public class Plateau implements TwoDimensionalSpace {
 		id = evt.getId();
 		this.dimensions = new TwoDimensions(new TwoDimensionalCoordinates(evt.getWidth(), evt.getHeight()));
 		logger.debug("new plateau id: {} with width {} and height {}", this.id, this.dimensions.getWidth(), this.dimensions.getHeight());
+		this.status = PlateauStatus.ACTIVE;
 		initializeLocations();
 	}
 
@@ -122,5 +125,14 @@ public class Plateau implements TwoDimensionalSpace {
 	public TwoDimensionalSpace getDimensions() {
 		return dimensions;
 	}
+	
+	public PlateauStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PlateauStatus status) {
+		this.status = status;
+	}
+
 
 }
