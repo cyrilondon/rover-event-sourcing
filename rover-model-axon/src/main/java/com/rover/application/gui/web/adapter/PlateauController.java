@@ -2,7 +2,9 @@ package com.rover.application.gui.web.adapter;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +28,11 @@ public class PlateauController {
 	@PostMapping
 	public CompletableFuture<String> createPlateau(@RequestBody PlateauInitializeCmdDto plateauInitializeCmdDto) {
 		return plateauCommandService.initializePlateau(plateauInitializeCmdDto);
+	}
+
+	@PutMapping(value = "/{plateauId}")
+	public CompletableFuture<String> desactivatePlateau(@PathVariable(value = "plateauId") String plateauUUID) {
+		return plateauCommandService.desactivatePlateau(plateauUUID);
 	}
 
 }

@@ -4,9 +4,12 @@ import java.util.UUID;
 
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
+import org.hamcrest.core.StringContains;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.rover.domain.api.PlateauDesactivateCmd;
+import com.rover.domain.api.PlateauDesactivatedEvt;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.api.PlateauInitializedEvt;
 import com.rover.domain.model.entity.plateau.Plateau;
@@ -59,7 +62,7 @@ public class PlateauTest {
 				.expectException(EntityValidationException.class)
 				.expectExceptionMessage("[ERR-001] Plateau width [-2] should be strictly positive");
 	}
-	
+
 	@Test
 	public void testPlateauInitializeCmdNegativeWidthAndHeight() {
 		UUID uuid = UUID.randomUUID();
@@ -67,8 +70,30 @@ public class PlateauTest {
 		int height = width;
 		String expectedErrorMessage = "[ERR-001] Plateau width [-2] should be strictly positive, Plateau height [-2] should strictly positive";
 		fixture.given().when(new PlateauInitializeCmd(uuid, width, height))
-				.expectException(EntityValidationException.class)
-				.expectExceptionMessage(expectedErrorMessage);
+				.expectException(EntityValidationException.class).expectExceptionMessage(expectedErrorMessage);
+	}
+
+	@Test
+	public void testPlateauDesactivate() {
+		UUID plateauUUID = UUID.randomUUID();
+		int width = 5;
+		int height = width;
+		fixture.given(new PlateauInitializedEvt(plateauUUID, width, height))
+				.when(new PlateauDesactivateCmd(plateauUUID)).expectSuccessfulHandlerExecution()
+				.expectEvents(new PlateauDesactivatedEvt(plateauUUID));
+	}
+
+	@Test(expectedExceptions = AssertionError.class)
+	public void testPlateauDesactivateNotFound() {
+		UUID plateauUUID = UUID.randomUUID();
+		UUID plateauUUIDNotExists = UUID.randomUUID();
+		int width = 5;
+		int height = width;
+		fixture.given(new PlateauInitializedEvt(plateauUUID, width, height))
+				.when(new PlateauDesactivateCmd(plateauUUIDNotExists)).expectException(AssertionError.class)
+				.expectExceptionMessage(StringContains.containsString(
+						"The aggregate used in this fixture was initialized with an identifier different than the one used to load it"));
+
 	}
 
 }

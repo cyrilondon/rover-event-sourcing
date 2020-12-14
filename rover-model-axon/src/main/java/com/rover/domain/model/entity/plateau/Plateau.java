@@ -12,10 +12,12 @@ import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.rover.domain.api.PlateauInitializeCmd;
-import com.rover.domain.api.PlateauInitializedEvt;
 import com.rover.application.context.GameContext;
 import com.rover.core.validation.ArgumentCheck;
+import com.rover.domain.api.PlateauDesactivateCmd;
+import com.rover.domain.api.PlateauDesactivatedEvt;
+import com.rover.domain.api.PlateauInitializeCmd;
+import com.rover.domain.api.PlateauInitializedEvt;
 import com.rover.domain.model.entity.dimensions.TwoDimensionalCoordinates;
 import com.rover.domain.model.entity.dimensions.TwoDimensionalSpace;
 import com.rover.domain.model.entity.dimensions.TwoDimensions;
@@ -27,23 +29,18 @@ public class Plateau implements TwoDimensionalSpace {
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@AggregateIdentifier
-	private UUID id;
+	private UUID plateauId;
 
 	private TwoDimensionalSpace dimensions;
-	
+
 	private PlateauStatus status;
-	
+
 	private PlateauValidator plateauValidator = GameContext.getInstance().getPlateauValidator();
 
 	/**
 	 * Matrix to keep track of the occupied locations
 	 */
 	boolean[][] locations;
-
-	public Plateau(UUID uuid, TwoDimensionalSpace dimensions) {
-		this.id = ArgumentCheck.preNotNull(uuid, GameExceptionLabels.MISSING_PLATEAU_UUID);
-		this.dimensions = ArgumentCheck.preNotNull(dimensions, GameExceptionLabels.MISSING_PLATEAU_DIMENSIONS);
-	}
 
 	public Plateau() {
 		// Required by Axon
@@ -63,20 +60,43 @@ public class Plateau implements TwoDimensionalSpace {
 		apply(new PlateauInitializedEvt(cmd.getId(), cmd.getWidth(), cmd.getHeight()));
 	}
 
+	@CommandHandler
+	public void handle(PlateauDesactivateCmd cmd) {
+		logger.debug("handling {}", cmd);
+		logger.debug("plateau id cyril {}", plateauId);
+		// basic validation
+		// publishing the event
+		apply(new PlateauDesactivatedEvt(plateauId));
+	}
+
 	@EventSourcingHandler
 	public void on(PlateauInitializedEvt evt) {
 		logger.debug("applying {}", evt);
-		id = evt.getId();
+		// setting the id
+	    this.plateauId = evt.getId();
 		this.dimensions = new TwoDimensions(new TwoDimensionalCoordinates(evt.getWidth(), evt.getHeight()));
-		logger.debug("new Plateau id: {} with width {} and height {}", this.id, this.dimensions.getWidth(), this.dimensions.getHeight());
+		logger.debug("new Plateau id: {} with width {} and height {}", this.plateauId, this.dimensions.getWidth(),
+				this.dimensions.getHeight());
 		this.status = PlateauStatus.ACTIVE;
 		initializeLocations();
 	}
 
-	private Plateau initializeLocations() {
+	@EventSourcingHandler
+	public void on(PlateauDesactivatedEvt evt) {
+		logger.debug("applying {}", evt);
+		this.status = PlateauStatus.INACTIVE;
+		// remove rovers
+		resetLocations();
+		logger.debug("Plateau id {} : desactivated", plateauId);
+	}
+
+	private void initializeLocations() {
 		this.locations = new boolean[getLocationIndexFromDimensions(
 				dimensions.getWidth())][getLocationIndexFromDimensions(dimensions.getHeight())];
-		return this;
+	}
+
+	private void resetLocations() {
+		this.locations = null;
 	}
 
 	/**
@@ -124,7 +144,7 @@ public class Plateau implements TwoDimensionalSpace {
 	public TwoDimensionalSpace getDimensions() {
 		return dimensions;
 	}
-	
+
 	public PlateauStatus getStatus() {
 		return status;
 	}
@@ -132,6 +152,5 @@ public class Plateau implements TwoDimensionalSpace {
 	public void setStatus(PlateauStatus status) {
 		this.status = status;
 	}
-
 
 }

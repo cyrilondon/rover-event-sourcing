@@ -5,6 +5,9 @@ import java.util.UUID
 
 data class PlateauInitializeCmd(@TargetAggregateIdentifier val id: UUID, val width: Int, val height: Int)
 data class PlateauInitializedEvt(val id: UUID, val width: Int, val height: Int)
+data class PlateauDesactivateCmd(@TargetAggregateIdentifier val id: UUID)
+data class PlateauDesactivatedEvt(val id: UUID)
+
 
 
 
