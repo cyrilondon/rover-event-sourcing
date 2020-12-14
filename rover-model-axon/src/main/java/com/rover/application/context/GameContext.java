@@ -1,6 +1,6 @@
 package com.rover.application.context;
 
-import com.rover.domain.model.entity.plateau.PlateauValidator;
+import com.rover.domain.command.model.entity.plateau.PlateauValidator;
 
 /**
  * Application context whose responsibility is to keep track of the game state.

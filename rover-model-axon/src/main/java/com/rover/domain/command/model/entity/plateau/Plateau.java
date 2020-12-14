@@ -1,4 +1,4 @@
-package com.rover.domain.model.entity.plateau;
+package com.rover.domain.command.model.entity.plateau;
 
 import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 
@@ -18,10 +18,10 @@ import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauDesactivatedEvt;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.api.PlateauInitializedEvt;
-import com.rover.domain.model.entity.dimensions.TwoDimensionalCoordinates;
-import com.rover.domain.model.entity.dimensions.TwoDimensionalSpace;
-import com.rover.domain.model.entity.dimensions.TwoDimensions;
-import com.rover.domain.model.exception.GameExceptionLabels;
+import com.rover.domain.command.model.entity.dimensions.TwoDimensionalCoordinates;
+import com.rover.domain.command.model.entity.dimensions.TwoDimensionalSpace;
+import com.rover.domain.command.model.entity.dimensions.TwoDimensions;
+import com.rover.domain.command.model.exception.GameExceptionLabels;
 
 @Aggregate
 public class Plateau implements TwoDimensionalSpace {
@@ -34,7 +34,9 @@ public class Plateau implements TwoDimensionalSpace {
 	private TwoDimensionalSpace dimensions;
 
 	private PlateauStatus status;
-
+	
+	private int nbfOfPositionsBusy;
+	
 	private PlateauValidator plateauValidator = GameContext.getInstance().getPlateauValidator();
 
 	/**
@@ -152,5 +154,14 @@ public class Plateau implements TwoDimensionalSpace {
 	public void setStatus(PlateauStatus status) {
 		this.status = status;
 	}
+	
+	public int getNbfOfPositionsBusy() {
+		return nbfOfPositionsBusy;
+	}
+
+	public void setNbfOfPositionsBusy(int nbfOfPositionsBusy) {
+		this.nbfOfPositionsBusy = nbfOfPositionsBusy;
+	}
+
 
 }

@@ -12,8 +12,8 @@ import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauDesactivatedEvt;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.api.PlateauInitializedEvt;
-import com.rover.domain.model.entity.plateau.Plateau;
-import com.rover.domain.model.exception.EntityValidationException;
+import com.rover.domain.command.model.entity.plateau.Plateau;
+import com.rover.domain.command.model.exception.EntityValidationException;
 
 public class PlateauTest {
 

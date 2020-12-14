@@ -1,4 +1,4 @@
-package com.rover.domain.model.validation;
+package com.rover.domain.command.model.validation;
 
 public interface ValidationNotificationHandler {
 	

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rover.application.command.dto.plateau.PlateauInitializeCmdDto;
-import com.rover.domain.model.service.plateau.PlateauCommandService;
+import com.rover.domain.command.model.service.plateau.PlateauCommandService;
 
 import io.swagger.annotations.Api;
 

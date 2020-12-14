@@ -1,4 +1,4 @@
-package com.rover.domain.model.entity.dimensions;
+package com.rover.domain.command.model.entity.dimensions;
 
 /**
  * Plateau dimensions are linked to the coordinates by the number of dimensions (x,y as per now

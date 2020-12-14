@@ -25,7 +25,9 @@ Verify that you have a row inserted in the table `DOMAIN_EVENT_ENTRY`, as per be
 
 <img src="images/Plateau_H2.PNG" />
 
-Notice that Event Sourcing does NOT need to rely on specific type entity tables to save them, and thus does not need to handle the atomicity of the (save entity + event publishing) operation. Actually, Event sourcing is one of the best ways to atomically update state and publish an event.
+Notice that per nature `Event Sourcing` persists the state of a business entity as a sequence of state-changing events in an event-store, and thus does NOT need to rely on specific type entity tables to save them, avoiding the need to handle the atomicity of the (save entity + event publishing) operation as described per the pattern [Transactional Outbox](https://microservices.io/patterns/data/transactional-outbox.html).
+
+Actually, `Event sourcing` is one of the best ways to atomically update state and publish an event.
 
 Finally check the logs, and the way the command and event are processed to initialize the plateaus
 

@@ -1,8 +1,8 @@
 package com.rover.core.validation;
 
 import com.rover.core.util.StringUtils;
-import com.rover.domain.model.exception.GameExceptionLabels;
-import com.rover.domain.model.exception.IllegalArgumentGameException;
+import com.rover.domain.command.model.exception.GameExceptionLabels;
+import com.rover.domain.command.model.exception.IllegalArgumentGameException;
 
 /**
  * Utility validation class used to check the method arguments nullity or emptiness.

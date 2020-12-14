@@ -1,10 +1,10 @@
-package com.rover.domain.model.entity.plateau;
+package com.rover.domain.command.model.entity.plateau;
 
 import com.rover.domain.api.PlateauInitializeCmd;
-import com.rover.domain.model.exception.GameExceptionLabels;
-import com.rover.domain.model.validation.EntityDefaultValidationNotificationHandler;
-import com.rover.domain.model.validation.EntityValidator;
-import com.rover.domain.model.validation.ValidationNotificationHandler;
+import com.rover.domain.command.model.exception.GameExceptionLabels;
+import com.rover.domain.command.model.validation.EntityDefaultValidationNotificationHandler;
+import com.rover.domain.command.model.validation.EntityValidator;
+import com.rover.domain.command.model.validation.ValidationNotificationHandler;
 
 public class PlateauValidator implements EntityValidator {
 

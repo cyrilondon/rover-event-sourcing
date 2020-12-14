@@ -1,4 +1,4 @@
-package com.rover.domain.model.service.plateau;
+package com.rover.domain.command.model.service.plateau;
 
 import java.util.concurrent.CompletableFuture;
 

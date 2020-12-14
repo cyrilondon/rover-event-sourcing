@@ -1,4 +1,4 @@
-package com.rover.domain.model.exception;
+package com.rover.domain.command.model.exception;
 
 /**
  * We externalize all error messages and code in this class to have a better

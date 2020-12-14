@@ -1,6 +1,6 @@
-package com.rover.domain.model.validation;
+package com.rover.domain.command.model.validation;
 
-import com.rover.domain.model.exception.EntityValidationException;
+import com.rover.domain.command.model.exception.EntityValidationException;
 
 public class EntityDefaultValidationNotificationHandler implements ValidationNotificationHandler {
 

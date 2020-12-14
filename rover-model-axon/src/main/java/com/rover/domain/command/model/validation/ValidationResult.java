@@ -1,4 +1,4 @@
-package com.rover.domain.model.validation;
+package com.rover.domain.command.model.validation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.rover.domain.model.exception;
+package com.rover.domain.command.model.exception;
 
 /**
  * In case of something goes wrong during the Game, we want the process to exit thus the choice for {@link RuntimeException}

@@ -3,8 +3,8 @@ package com.rover.application.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.rover.domain.model.entity.plateau.PlateauValidator;
-import com.rover.domain.model.validation.EntityValidator;
+import com.rover.domain.command.model.entity.plateau.PlateauValidator;
+import com.rover.domain.command.model.validation.EntityValidator;
 
 public class ServiceLocator {
 

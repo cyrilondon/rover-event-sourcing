@@ -1,4 +1,4 @@
-package com.rover.domain.model.exception;
+package com.rover.domain.command.model.exception;
 
 
 public class IllegalArgumentGameException extends GameException {

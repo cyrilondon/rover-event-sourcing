@@ -1,4 +1,4 @@
-package com.rover.domain.model.entity.dimensions;
+package com.rover.domain.command.model.entity.dimensions;
 
 public interface TwoDimensionalSpace {
 	
