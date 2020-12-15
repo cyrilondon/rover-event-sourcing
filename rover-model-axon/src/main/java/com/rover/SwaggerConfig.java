@@ -1,4 +1,4 @@
-package com.rover.application;
+package com.rover;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
