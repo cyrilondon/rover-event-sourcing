@@ -1,8 +1,7 @@
 package com.rover.domain.query;
 
 import java.lang.invoke.MethodHandles;
-
-import javax.persistence.EntityManager;
+import java.util.Optional;
 
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
@@ -19,11 +18,11 @@ public class PlateauViewProjection {
 
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	private final EntityManager entityManager;
+	private final PlateauSummaryRepository repository;
 	private final QueryUpdateEmitter queryUpdateEmitter;
 
-	public PlateauViewProjection(EntityManager entityManager, QueryUpdateEmitter queryUpdateEmitter) {
-		this.entityManager = entityManager;
+	public PlateauViewProjection(PlateauSummaryRepository repository, QueryUpdateEmitter queryUpdateEmitter) {
+		this.repository = repository;
 		this.queryUpdateEmitter = queryUpdateEmitter;
 	}
 
@@ -34,14 +33,18 @@ public class PlateauViewProjection {
 		 * Update our read model by inserting the new plateau. This is done so that
 		 * upcoming regular (non-subscription) queries get correct data.
 		 */
-		entityManager.persist(new PlateauSummary(event.getId().toString(), PlateauStatus.ACTIVE));
+		repository.save(new PlateauSummary(event.getId().toString(), PlateauStatus.ACTIVE));
 	}
 	
 	@EventHandler
 	public void on(PlateauDesactivatedEvt event) {
 		logger.debug("projecting {}", event);
-		 PlateauSummary summary = entityManager.find(PlateauSummary.class, event.getId().toString());
-	     summary.setStatus(PlateauStatus.INACTIVE);
+		Optional<PlateauSummary> summary = repository.findById(event.getId().toString());
+		// should not happen as the first thing done is to rehydrate the state when the command is recieved
+		// if the entity is not found before to publish the event we will get an generic AggregateNotFoundException
+	    if (summary.isPresent()) {
+	    	summary.get().setStatus(PlateauStatus.INACTIVE);
+	    }
 		
 	}
 	

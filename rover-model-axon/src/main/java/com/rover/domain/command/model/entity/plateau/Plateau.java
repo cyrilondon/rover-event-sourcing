@@ -65,7 +65,6 @@ public class Plateau implements TwoDimensionalSpace {
 	@CommandHandler
 	public void handle(PlateauDesactivateCmd cmd) {
 		logger.debug("handling {}", cmd);
-		logger.debug("plateau id cyril {}", plateauId);
 		// basic validation
 		// publishing the event
 		apply(new PlateauDesactivatedEvt(plateauId));

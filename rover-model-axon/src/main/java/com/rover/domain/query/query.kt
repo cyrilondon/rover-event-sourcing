@@ -13,6 +13,8 @@ data class PlateauSummary(@Id var id: String, var status: PlateauStatus) {
     constructor() : this("", PlateauStatus.ACTIVE)
 }
 
+interface PlateauSummaryRepository : JpaRepository<PlateauSummary, String>
+
 
 
 
