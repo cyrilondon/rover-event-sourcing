@@ -15,6 +15,10 @@ public class PlateauCommandMapper {
 		return new PlateauInitializeCmd(UUID.randomUUID(), plateauInitializeCmdDto.getWidth(), plateauInitializeCmdDto.getHeight());
 	}
 	
+	public PlateauInitializeCmd toPlateauInitializeCmd(int width, int height){
+		return new PlateauInitializeCmd(UUID.randomUUID(), width, height);
+	}
+	
 	public PlateauDesactivateCmd toPlateauDesactivateCmd(String plateauId) {
 		return new PlateauDesactivateCmd(UUID.fromString(plateauId));
 	}
