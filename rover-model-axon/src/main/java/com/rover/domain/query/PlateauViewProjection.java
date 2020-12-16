@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.axonframework.eventhandling.EventHandler;
+import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,19 +36,24 @@ public class PlateauViewProjection {
 		 */
 		repository.save(new PlateauSummary(event.getId().toString(), PlateauStatus.ACTIVE));
 	}
-	
+
 	@EventHandler
 	public void on(PlateauDesactivatedEvt event) {
 		logger.debug("projecting {}", event);
 		Optional<PlateauSummary> summary = repository.findById(event.getId().toString());
-		// should not happen as the first thing done is to rehydrate the state when the command is recieved
-		// if the entity is not found before to publish the event we will get an generic AggregateNotFoundException
-	    if (summary.isPresent()) {
-	    	summary.get().setStatus(PlateauStatus.INACTIVE);
-	    }
-		
+		// should not happen as the first thing done is to rehydrate the state when the
+		// command is recieved
+		// if the entity is not found before to publish the event we will get an generic
+		// AggregateNotFoundException
+		if (summary.isPresent()) {
+			summary.get().setStatus(PlateauStatus.INACTIVE);
+		}
 	}
 	
+	@QueryHandler
+	public PlateauSummary handle(FindPlateauSummaryQuery query) {
+		return repository.findById(query.getPlateauId()).orElse(null);
+	}
 	
 	
 

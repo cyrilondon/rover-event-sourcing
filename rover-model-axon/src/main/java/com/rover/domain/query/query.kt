@@ -15,6 +15,8 @@ data class PlateauSummary(@Id var id: String, var status: PlateauStatus) {
 
 interface PlateauSummaryRepository : JpaRepository<PlateauSummary, String>
 
+data class FindPlateauSummaryQuery(val plateauId: String)
+
 
 
 
