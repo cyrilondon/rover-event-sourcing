@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rover.application.command.dto.plateau.PlateauInitializeCmdDto;
+import com.rover.domain.api.PlateauDesactivateCmd;
+import com.rover.domain.api.PlateauInitializeCmd;
+import com.rover.domain.command.model.service.command.PlateauCommandMapper;
 import com.rover.domain.command.model.service.plateau.PlateauCommandService;
 import com.rover.domain.query.FindPlateauSummaryQuery;
 import com.rover.domain.query.PlateauSummary;
@@ -26,21 +29,27 @@ public class PlateauController {
 
 	private final PlateauCommandService plateauCommandService;
 	
+	private final PlateauCommandMapper plateauCommandMapper;
+	
 	private final QueryGateway queryGateway;
+	
 
-	public PlateauController(PlateauCommandService plateauCommandService, QueryGateway queryGateway) {
+	public PlateauController(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper, QueryGateway queryGateway) {
 		this.plateauCommandService = plateauCommandService;
+		this.plateauCommandMapper = plateauCommandMapper;
 		this.queryGateway = queryGateway;
 	}
 
 	@PostMapping
 	public CompletableFuture<String> createPlateau(@RequestBody PlateauInitializeCmdDto plateauInitializeCmdDto) {
-		return plateauCommandService.initializePlateau(plateauInitializeCmdDto);
+		PlateauInitializeCmd cmd = plateauCommandMapper.toPlateauInitializeCmd(plateauInitializeCmdDto);
+		return plateauCommandService.initializePlateau(cmd);
 	}
 
 	@PutMapping(value = "/{plateauId}")
 	public CompletableFuture<String> desactivatePlateau(@PathVariable(value = "plateauId") String plateauUUID) {
-		return plateauCommandService.desactivatePlateau(plateauUUID);
+		PlateauDesactivateCmd cmd = plateauCommandMapper.toPlateauDesactivateCmd(plateauUUID);
+		return plateauCommandService.desactivatePlateau(cmd);
 	}
 	
 	@GetMapping(value = "/{plateauId}")
