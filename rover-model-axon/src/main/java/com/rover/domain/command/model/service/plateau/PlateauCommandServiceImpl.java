@@ -1,5 +1,6 @@
 package com.rover.domain.command.model.service.plateau;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
@@ -18,12 +19,12 @@ public class PlateauCommandServiceImpl implements PlateauCommandService {
 	    }
 
 	@Override
-	public CompletableFuture<String> initializePlateau(PlateauInitializeCmd plateauInitializeCmd) {
+	public CompletableFuture<UUID> initializePlateau(PlateauInitializeCmd plateauInitializeCmd) {
 		  return commandPublisher.send(plateauInitializeCmd);
 	}
 
 	@Override
-	public CompletableFuture<String> desactivatePlateau(PlateauDesactivateCmd plateauDesactivateCmd) {
+	public CompletableFuture<UUID> desactivatePlateau(PlateauDesactivateCmd plateauDesactivateCmd) {
 		 return commandPublisher.send(plateauDesactivateCmd);
 	}
 

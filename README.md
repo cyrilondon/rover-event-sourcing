@@ -11,7 +11,7 @@ This project provides an event-sourcing example of the famous Rover exercise (us
  	
    Project test sources are located under `src/test/java`.
 
-2. Go to the  inner project and type `mvn clean package spring-boot:run`. 
+2. Go to the  inner project [rover model axon](rover-model-axon/) and type `mvn clean package spring-boot:run`. 
 
 This will build the project, run the Unit Tests and start a Spring Boot application with an embedded Tomcat along with a in-memory H2 database.
 

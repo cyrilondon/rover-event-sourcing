@@ -1,5 +1,6 @@
 package com.rover.application.gui.web.adapter;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -41,15 +42,15 @@ public class PlateauController {
 	}
 
 	@PostMapping
-	public CompletableFuture<String> createPlateau(@RequestBody PlateauInitializeCmdDto plateauInitializeCmdDto) {
+	public CompletableFuture<UUID> createPlateau(@RequestBody PlateauInitializeCmdDto plateauInitializeCmdDto) {
 		PlateauInitializeCmd cmd = plateauCommandMapper.toPlateauInitializeCmd(plateauInitializeCmdDto);
 		return plateauCommandService.initializePlateau(cmd);
 	}
 
 	@PutMapping(value = "/{plateauId}")
-	public CompletableFuture<String> desactivatePlateau(@PathVariable(value = "plateauId") String plateauUUID) {
+	public void desactivatePlateau(@PathVariable(value = "plateauId") String plateauUUID) {
 		PlateauDesactivateCmd cmd = plateauCommandMapper.toPlateauDesactivateCmd(plateauUUID);
-		return plateauCommandService.desactivatePlateau(cmd);
+		plateauCommandService.desactivatePlateau(cmd);
 	}
 	
 	@GetMapping(value = "/{plateauId}")
