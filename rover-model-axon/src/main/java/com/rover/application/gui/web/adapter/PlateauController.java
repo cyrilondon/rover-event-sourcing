@@ -23,6 +23,7 @@ import com.rover.domain.command.model.service.plateau.PlateauCommandService;
 import com.rover.domain.query.FindAllPlateauSummaryQuery;
 import com.rover.domain.query.FindPlateauSummaryQuery;
 import com.rover.domain.query.PlateauSummary;
+import com.rover.domain.query.PlateauSummaryFilter;
 
 import io.swagger.annotations.Api;
 import reactor.core.publisher.Mono;
@@ -33,15 +34,15 @@ import reactor.core.publisher.Mono;
 public class PlateauController {
 
 	private final PlateauCommandService plateauCommandService;
-	
-	private final PlateauCommandMapper plateauCommandMapper;
-	
-	private final QueryGateway queryGateway;
-	
-	 private final ReactorQueryGateway reactorQueryGateway;
-	
 
-	public PlateauController(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper, QueryGateway queryGateway, ReactorQueryGateway reactorQueryGateway) {
+	private final PlateauCommandMapper plateauCommandMapper;
+
+	private final QueryGateway queryGateway;
+
+	private final ReactorQueryGateway reactorQueryGateway;
+
+	public PlateauController(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
+			QueryGateway queryGateway, ReactorQueryGateway reactorQueryGateway) {
 		this.plateauCommandService = plateauCommandService;
 		this.plateauCommandMapper = plateauCommandMapper;
 		this.queryGateway = queryGateway;
@@ -59,15 +60,16 @@ public class PlateauController {
 		PlateauDesactivateCmd cmd = plateauCommandMapper.toPlateauDesactivateCmd(plateauUUID);
 		plateauCommandService.desactivatePlateau(cmd);
 	}
-	
+
 	@GetMapping(value = "/{plateauId}")
 	public CompletableFuture<PlateauSummary> findById(@PathVariable(value = "plateauId") String plateauUUID) {
 		return queryGateway.query(new FindPlateauSummaryQuery(plateauUUID), PlateauSummary.class);
 	}
-	
+
 	@GetMapping(value = "/all")
-	public Mono<List<String>> findAll() {
-		return reactorQueryGateway.query(new FindAllPlateauSummaryQuery(), ResponseTypes.multipleInstancesOf(String.class));
+	public Mono<List<PlateauSummary>> findAll() {
+		return reactorQueryGateway.query(new FindAllPlateauSummaryQuery(0, 20, new PlateauSummaryFilter("")),
+				ResponseTypes.multipleInstancesOf(PlateauSummary.class));
 	}
 
 }

@@ -3,20 +3,28 @@ package com.rover.application.gui;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.axonframework.queryhandling.QueryGateway;
+
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.command.model.service.command.PlateauCommandMapper;
 import com.rover.domain.command.model.service.plateau.PlateauCommandService;
+import com.rover.domain.query.PlateauSummary;
+import com.rover.domain.query.PlateauSummaryFilter;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.components.grid.HeaderRow;
 
 @SpringUI
 public class PlateauGUI extends UI {
@@ -27,20 +35,27 @@ public class PlateauGUI extends UI {
 
 	private final PlateauCommandMapper plateauCommandMapper;
 
-	public PlateauGUI(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper) {
+	private PlateauSummaryDataProvider plateauSummaryDataProvider;
+
+	private final QueryGateway queryGateway;
+
+	public PlateauGUI(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
+			PlateauSummaryDataProvider plateauSummaryDataProvider, QueryGateway queryGateway) {
 		this.plateauCommandService = plateauCommandService;
 		this.plateauCommandMapper = plateauCommandMapper;
+		this.plateauSummaryDataProvider = plateauSummaryDataProvider;
+		this.queryGateway = queryGateway;
 	}
 
 	@Override
 	protected void init(VaadinRequest request) {
-		HorizontalLayout plateauBar = new HorizontalLayout();
-		plateauBar.setWidth("100%");
-		plateauBar.addComponents(createPlateauPanel(), desactivatePlateauPanel());
-		
+		HorizontalLayout commandBar = new HorizontalLayout();
+		commandBar.setWidth("100%");
+		commandBar.addComponents(createPlateauPanel(), desactivatePlateauPanel());
+
 		VerticalLayout layout = new VerticalLayout();
-		layout.setSizeFull();
-		layout.addComponents(plateauBar);
+		layout.addComponents(commandBar, summaryLayout());
+		layout.setHeight(95, Unit.PERCENTAGE);
 
 		setContent(layout);
 	}
@@ -94,8 +109,7 @@ public class PlateauGUI extends UI {
 			result.whenComplete((msg, ex) -> {
 				// show notification to the user
 				if (ex != null) {
-					Notification.show(
-							String.format("%s [Plateau id = %s]", ex.getMessage(), plateauId.getValue()),
+					Notification.show(String.format("%s [Plateau id = %s]", ex.getMessage(), plateauId.getValue()),
 							Notification.Type.ERROR_MESSAGE);
 
 				} else {
@@ -114,6 +128,42 @@ public class PlateauGUI extends UI {
 		panel.setContent(form);
 		panel.setHeight(300, Unit.PIXELS);
 		return panel;
+	}
+
+	private Layout summaryLayout() {
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setSizeFull();
+		Button refreshButton = new Button("Refresh");
+		refreshButton.addClickListener(event -> plateauSummaryDataProvider.refreshAll());
+		Grid summaryGrid = summaryGrid();
+		layout.addComponents(refreshButton, summaryGrid);
+		layout.setExpandRatio(refreshButton, 0);
+		layout.setExpandRatio(summaryGrid, 1);
+		return layout;
+	}
+
+	private Grid summaryGrid() {
+		plateauSummaryDataProvider = new PlateauSummaryDataProvider(queryGateway);
+		Grid<PlateauSummary> grid = new Grid<>();
+		Grid.Column<PlateauSummary, String> idColumn = grid.addColumn(PlateauSummary::getId).setCaption("Plateau ID");
+		grid.addColumn(PlateauSummary::getWidth).setCaption("Width");
+		grid.addColumn(PlateauSummary::getHeight).setCaption("Height");
+		grid.addColumn(PlateauSummary::getStatus).setCaption("Status");
+
+		HeaderRow filterRow = grid.appendHeaderRow();
+		TextField idStartsWith = new TextField();
+		idStartsWith.setValueChangeMode(ValueChangeMode.EAGER);
+		idStartsWith.setPlaceholder("Starting with");
+		idStartsWith.addValueChangeListener(event -> {
+			plateauSummaryDataProvider.setFilter(new PlateauSummaryFilter(event.getValue()));
+			plateauSummaryDataProvider.refreshAll();
+		});
+		filterRow.getCell(idColumn).setComponent(idStartsWith);
+
+		grid.setSizeFull();
+		grid.setDataProvider(plateauSummaryDataProvider);
+
+		return grid;
 	}
 
 }

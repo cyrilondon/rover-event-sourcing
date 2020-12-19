@@ -3,7 +3,9 @@ package com.rover.domain.query;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
@@ -22,9 +24,12 @@ class PlateauViewProjection {
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private final PlateauSummaryRepository repository;
+	private final EntityManager entityManager;
 	private final QueryUpdateEmitter queryUpdateEmitter;
 
-	public PlateauViewProjection(PlateauSummaryRepository repository, QueryUpdateEmitter queryUpdateEmitter) {
+	public PlateauViewProjection(EntityManager entityManager, PlateauSummaryRepository repository,
+			QueryUpdateEmitter queryUpdateEmitter) {
+		this.entityManager = entityManager;
 		this.repository = repository;
 		this.queryUpdateEmitter = queryUpdateEmitter;
 	}
@@ -32,14 +37,14 @@ class PlateauViewProjection {
 	@EventHandler
 	public void on(PlateauInitializedEvt event) {
 		logger.debug("projecting {}", event);
-		
+
 		String plateauId = event.getId().toString();
 		/*
 		 * Update our read model by inserting the new plateau. This is done so that
 		 * upcoming regular (non-subscription) queries get correct data.
 		 */
-		repository.save(new PlateauSummary(plateauId, PlateauStatus.ACTIVE));
-		
+		repository.save(new PlateauSummary(plateauId, event.getWidth(), event.getHeight(), PlateauStatus.ACTIVE));
+
 		queryUpdateEmitter.emit(FindAllPlateauSummaryQuery.class, query -> true, plateauId);
 	}
 
@@ -68,9 +73,22 @@ class PlateauViewProjection {
 	}
 
 	@QueryHandler
-	public List<String> handle(FindAllPlateauSummaryQuery query) {
-		logger.debug("handling query {}", query);
-		return repository.findAll().stream().map(PlateauSummary::getId).collect(Collectors.toList());
+	public List<PlateauSummary> handle(FindAllPlateauSummaryQuery query) {
+		logger.debug("handling {}", query);
+		TypedQuery<PlateauSummary> jpaQuery = entityManager.createNamedQuery("PlateauSummary.fetch",
+				PlateauSummary.class);
+		jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
+		jpaQuery.setFirstResult(query.getOffset());
+		jpaQuery.setMaxResults(query.getLimit());
+		return jpaQuery.getResultList();
+	}
+
+	@QueryHandler
+	public Integer handle(CountPlateauSummaryQuery query) {
+		logger.debug("handling {}", query);
+		TypedQuery<Long> jpaQuery = entityManager.createNamedQuery("PlateauSummary.count", Long.class);
+		jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
+		return jpaQuery.getSingleResult().intValue();
 	}
 
 }
