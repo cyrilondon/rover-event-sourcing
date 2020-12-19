@@ -1,8 +1,10 @@
 package com.rover.application.gui.web.adapter;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +20,12 @@ import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.command.model.service.command.PlateauCommandMapper;
 import com.rover.domain.command.model.service.plateau.PlateauCommandService;
+import com.rover.domain.query.FindAllPlateauSummaryQuery;
 import com.rover.domain.query.FindPlateauSummaryQuery;
 import com.rover.domain.query.PlateauSummary;
 
 import io.swagger.annotations.Api;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping(value = "/plateau")
@@ -34,28 +38,36 @@ public class PlateauController {
 	
 	private final QueryGateway queryGateway;
 	
+	 private final ReactorQueryGateway reactorQueryGateway;
+	
 
-	public PlateauController(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper, QueryGateway queryGateway) {
+	public PlateauController(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper, QueryGateway queryGateway, ReactorQueryGateway reactorQueryGateway) {
 		this.plateauCommandService = plateauCommandService;
 		this.plateauCommandMapper = plateauCommandMapper;
 		this.queryGateway = queryGateway;
+		this.reactorQueryGateway = reactorQueryGateway;
 	}
 
 	@PostMapping
-	public CompletableFuture<UUID> createPlateau(@RequestBody PlateauInitializeCmdDto plateauInitializeCmdDto) {
+	public CompletableFuture<UUID> create(@RequestBody PlateauInitializeCmdDto plateauInitializeCmdDto) {
 		PlateauInitializeCmd cmd = plateauCommandMapper.toPlateauInitializeCmd(plateauInitializeCmdDto);
 		return plateauCommandService.initializePlateau(cmd);
 	}
 
 	@PutMapping(value = "/{plateauId}")
-	public void desactivatePlateau(@PathVariable(value = "plateauId") String plateauUUID) {
+	public void desactivate(@PathVariable(value = "plateauId") String plateauUUID) {
 		PlateauDesactivateCmd cmd = plateauCommandMapper.toPlateauDesactivateCmd(plateauUUID);
 		plateauCommandService.desactivatePlateau(cmd);
 	}
 	
 	@GetMapping(value = "/{plateauId}")
-	public CompletableFuture<PlateauSummary> handle(@PathVariable(value = "plateauId") String plateauUUID) {
-		return queryGateway.query(new FindPlateauSummaryQuery(plateauUUID), ResponseTypes.instanceOf(PlateauSummary.class));
+	public CompletableFuture<PlateauSummary> findById(@PathVariable(value = "plateauId") String plateauUUID) {
+		return queryGateway.query(new FindPlateauSummaryQuery(plateauUUID), PlateauSummary.class);
+	}
+	
+	@GetMapping(value = "/all")
+	public Mono<List<String>> findAll() {
+		return reactorQueryGateway.query(new FindAllPlateauSummaryQuery(), ResponseTypes.multipleInstancesOf(String.class));
 	}
 
 }

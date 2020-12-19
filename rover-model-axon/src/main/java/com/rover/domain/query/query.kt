@@ -17,6 +17,8 @@ interface PlateauSummaryRepository : JpaRepository<PlateauSummary, String>
 
 data class FindPlateauSummaryQuery(val plateauId: String)
 
+class FindAllPlateauSummaryQuery(){ override fun toString() : String = "FindAllPlateauSummaryQuery" }
+
 
 
 

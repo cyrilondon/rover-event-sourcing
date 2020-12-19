@@ -122,6 +122,18 @@
 			<artifactId>kotlin-reflect</artifactId>
 		</dependency>
 		
+		<dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.3.6.RELEASE</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.axonframework.extensions.reactor</groupId>
+            <artifactId>axon-reactor-spring-boot-starter</artifactId>
+            <version>4.4.2</version>
+        </dependency>
+		
 			<!-- Vaadin -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
