@@ -200,4 +200,10 @@ and all our PlateauSummary will be nicely displayed as per below
 
 <img src="images/Vaadin_list.PNG" />
 
+## Reactive subscription queries
+
+Something has been missing so far: our queries were executed in a simple request/response fashion (via a manual refresh), whereas in reality many modern applications are showing `live, asynchronously updated data` to their users.
+
+Axon Framework 3.3 has introduced `subscription queries` to bridge this gap in a truly elegant manner. 
+
 

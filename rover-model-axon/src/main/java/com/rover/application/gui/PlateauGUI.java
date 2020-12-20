@@ -11,6 +11,7 @@ import com.rover.domain.command.model.service.command.PlateauCommandMapper;
 import com.rover.domain.command.model.service.plateau.PlateauCommandService;
 import com.rover.domain.query.PlateauSummary;
 import com.rover.domain.query.PlateauSummaryFilter;
+import com.vaadin.annotations.Push;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.spring.annotation.SpringUI;
@@ -27,6 +28,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
 
 @SpringUI
+@Push
 public class PlateauGUI extends UI {
 
 	private static final long serialVersionUID = 1L;
@@ -133,11 +135,8 @@ public class PlateauGUI extends UI {
 	private Layout summaryLayout() {
 		HorizontalLayout layout = new HorizontalLayout();
 		layout.setSizeFull();
-		Button refreshButton = new Button("Refresh");
-		refreshButton.addClickListener(event -> plateauSummaryDataProvider.refreshAll());
 		Grid summaryGrid = summaryGrid();
-		layout.addComponents(refreshButton, summaryGrid);
-		layout.setExpandRatio(refreshButton, 0);
+		layout.addComponent(summaryGrid);
 		layout.setExpandRatio(summaryGrid, 1);
 		return layout;
 	}
@@ -164,6 +163,12 @@ public class PlateauGUI extends UI {
 		grid.setDataProvider(plateauSummaryDataProvider);
 
 		return grid;
+	}
+	
+	@Override
+	public void close() {
+		plateauSummaryDataProvider.close();
+		super.close();
 	}
 
 }

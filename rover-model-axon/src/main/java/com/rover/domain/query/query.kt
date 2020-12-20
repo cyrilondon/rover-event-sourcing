@@ -30,6 +30,8 @@ data class PlateauSummaryFilter(val idStartsWith: String = "")
 class CountPlateauSummaryQuery(val filter: PlateauSummaryFilter = PlateauSummaryFilter()) { override fun toString() : String = "CountPlateauSummariesQuery" }
 class FindAllPlateauSummaryQuery(val offset: Int, val limit: Int, val filter: PlateauSummaryFilter){ override fun toString() : String = "FindAllPlateauSummaryQuery" }
 
+class PlateauCountChangedUpdate
+
 
 
 

@@ -45,7 +45,10 @@ class PlateauViewProjection {
 		 */
 		repository.save(new PlateauSummary(plateauId, event.getWidth(), event.getHeight(), PlateauStatus.ACTIVE));
 
-		queryUpdateEmitter.emit(FindAllPlateauSummaryQuery.class, query -> true, plateauId);
+		// only emit this event if the id matches the one specified in the GUI search
+		// filter
+		queryUpdateEmitter.emit(CountPlateauSummaryQuery.class,
+				query -> plateauId.startsWith(query.getFilter().getIdStartsWith()), new PlateauCountChangedUpdate());
 	}
 
 	@EventHandler
@@ -63,6 +66,10 @@ class PlateauViewProjection {
 		} else {
 			throw new IllegalArgumentException("Plateau with id [" + event.getId() + "] could not be found.");
 		}
+
+		// update the findAll query with the current plateauSummary and only if the plateau id matches the search filter
+		queryUpdateEmitter.emit(FindAllPlateauSummaryQuery.class,
+				query -> event.getId().toString().startsWith(query.getFilter().getIdStartsWith()), summary.get());
 	}
 
 	@QueryHandler
