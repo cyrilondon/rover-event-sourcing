@@ -76,7 +76,7 @@ class PlateauViewProjection {
 		 * idStartWith string in the query's filter - send a message containing the new
 		 * state of this plateau summary
 		 */
-		queryUpdateEmitter.emit(FindAllPlateauSummaryQuery.class, query -> true, updatedPlateauSummary);
+		queryUpdateEmitter.emit(FindAllPlateauSummaryQuery.class, query -> summary.get().getId().startsWith(query.getFilter().getIdStartsWith()), updatedPlateauSummary);
 	}
 
 	@QueryHandler
