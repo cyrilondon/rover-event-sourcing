@@ -88,7 +88,7 @@ public class Plateau implements TwoDimensionalSpace {
 		this.status = PlateauStatus.INACTIVE;
 		// remove rovers
 		resetLocations();
-		logger.debug("Plateau id {} : desactivated with status", plateauId, status);
+		logger.debug("Plateau id {} : desactivated with status {}", plateauId, status);
 	}
 
 	private void initializeLocations() {

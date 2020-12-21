@@ -30,7 +30,7 @@ public class PlateauSummaryDataProvider extends AbstractBackEndDataProvider<Plat
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	
+
 	private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	private PlateauSummaryFilter filter = new PlateauSummaryFilter("");
@@ -57,13 +57,30 @@ public class PlateauSummaryDataProvider extends AbstractBackEndDataProvider<Plat
 				vaadinQuery.getLimit(), filter);
 		logger.debug("submitting from vaadin {}", findAllPlateauSummaryQuery);
 
+		/*
+		 * Submitting our query as a subscription query, specifying both the initially
+		 * expected response type (multiple PlateauSummaries) as wel as the expected
+		 * type of the updates (single CardSummary object). The result is a
+		 * SubscriptionQueryResult which contains a project reactor Mono for the initial
+		 * response, and a Flux for the updates.
+		 */
 		fetchQueryResult = queryGateway.subscriptionQuery(findAllPlateauSummaryQuery,
 				ResponseTypes.multipleInstancesOf(PlateauSummary.class),
 				ResponseTypes.instanceOf(PlateauSummary.class));
 
-		fetchQueryResult.updates()
-				.subscribe(plateauSummary -> fireEvent(new DataChangeEvent.DataRefreshEvent<>(this, plateauSummary)));
-
+		/*
+		 * Subscribing to the updates before we get the initial results.
+		 */
+		fetchQueryResult.updates().subscribe(plateauSummary -> {
+			logger.debug("processing query update for {}: {}", findAllPlateauSummaryQuery, plateauSummary);
+			/*
+			 * This is a Vaadin-specific call to update the UI as a result of data changes.
+			 */
+			fireEvent(new DataChangeEvent.DataRefreshEvent<>(this, plateauSummary));
+		});
+		/*
+		 * Returning the initial result.
+		 */
 		return fetchQueryResult.initialResult().block().stream();
 	}
 
@@ -75,15 +92,21 @@ public class PlateauSummaryDataProvider extends AbstractBackEndDataProvider<Plat
 			countQueryResult = null;
 		}
 
-		CountPlateauSummaryQuery countCardSummaryQuery = new CountPlateauSummaryQuery(filter);
-		logger.debug("submitting from vaadin {}", countCardSummaryQuery);
+		CountPlateauSummaryQuery countPlateauSummaryQuery = new CountPlateauSummaryQuery(filter);
+		logger.debug("submitting from vaadin {}", countPlateauSummaryQuery);
 
-		countQueryResult = queryGateway.subscriptionQuery(countCardSummaryQuery,
+		countQueryResult = queryGateway.subscriptionQuery(countPlateauSummaryQuery,
 				ResponseTypes.instanceOf(Integer.class), ResponseTypes.instanceOf(PlateauCountChangedUpdate.class));
 
 		// buffer the update every 250 ms
-		countQueryResult.updates().buffer(Duration.ofMillis(250)).subscribe(plateauCountChangedUpdate -> executorService.execute(() -> fireEvent(new DataChangeEvent<>(this))));
+		countQueryResult.updates().buffer(Duration.ofMillis(250)).subscribe(plateauCountChangedUpdate -> {
+			logger.debug("processing query update for {}: {}", countPlateauSummaryQuery, plateauCountChangedUpdate);
+			executorService.execute(() -> fireEvent(new DataChangeEvent<>(this)));
+		});
 
+		/*
+		 * Returning the initial result.
+		 */
 		return countQueryResult.initialResult().block();
 	}
 

@@ -61,15 +61,22 @@ class PlateauViewProjection {
 		// if the entity is not found there before to publish the event we will get an
 		// generic
 		// AggregateNotFoundException
+		PlateauSummary updatedPlateauSummary = null;
 		if (summary.isPresent()) {
-			summary.get().setStatus(PlateauStatus.INACTIVE);
+			updatedPlateauSummary = summary.get();
+			updatedPlateauSummary.setStatus(PlateauStatus.INACTIVE);
 		} else {
 			throw new IllegalArgumentException("Plateau with id [" + event.getId() + "] could not be found.");
 		}
 
-		// update the findAll query with the current plateauSummary and only if the plateau id matches the search filter
-		queryUpdateEmitter.emit(FindAllPlateauSummaryQuery.class,
-				query -> event.getId().toString().startsWith(query.getFilter().getIdStartsWith()), summary.get());
+		/*
+		 * Serve the subscribed queries by emitting an update. This reads as follows: -
+		 * to all current subscriptions of type FindAllPlateauSummaryQuery - for which
+		 * is true that the id of the Plateau having been desactivated starts with the
+		 * idStartWith string in the query's filter - send a message containing the new
+		 * state of this plateau summary
+		 */
+		queryUpdateEmitter.emit(FindAllPlateauSummaryQuery.class, query -> true, updatedPlateauSummary);
 	}
 
 	@QueryHandler
