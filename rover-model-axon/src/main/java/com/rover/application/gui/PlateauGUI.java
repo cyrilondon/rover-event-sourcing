@@ -12,10 +12,13 @@ import com.rover.domain.command.model.service.plateau.PlateauCommandService;
 import com.rover.domain.query.PlateauSummary;
 import com.rover.domain.query.PlateauSummaryFilter;
 import com.vaadin.annotations.Push;
+import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
@@ -41,6 +44,10 @@ public class PlateauGUI extends UI {
 
 	private final QueryGateway queryGateway;
 
+	Navigator navigator;
+	protected static final String CHARTVIEW = "chart";
+	protected static final String GRIDVIEW = "";
+
 	public PlateauGUI(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
 			PlateauSummaryDataProvider plateauSummaryDataProvider, QueryGateway queryGateway) {
 		this.plateauCommandService = plateauCommandService;
@@ -51,19 +58,34 @@ public class PlateauGUI extends UI {
 
 	@Override
 	protected void init(VaadinRequest request) {
-		HorizontalLayout commandBar = new HorizontalLayout();
-		commandBar.setWidth("100%");
-		commandBar.addComponents(createPlateauPanel(), desactivatePlateauPanel());
+		getPage().setTitle("Event-driven and reactive Rover application");
 
-		VerticalLayout layout = new VerticalLayout();
-		layout.addComponents(commandBar, summaryLayout());
-		layout.setHeight(95, Unit.PERCENTAGE);
+		// Create a navigator to control the views
+		navigator = new Navigator(this, this);
 
-		setContent(layout);
+		// Create and register the views
+		navigator.addView(GRIDVIEW, new PlateauGridView());
+	}
+	
+	public class PlateauGridView extends VerticalLayout implements View {
+
+		public PlateauGridView() {
+			HorizontalLayout commandBar = new HorizontalLayout();
+			commandBar.setWidth("100%");
+			commandBar.addComponents(createPlateauPanel(), desactivatePlateauPanel());
+
+			VerticalLayout layout = new VerticalLayout();
+			layout.addComponents(commandBar, summaryLayout());
+			layout.setHeight(95, Unit.PERCENTAGE);
+
+			addComponent(layout);
+		}
+
 	}
 
 	// The panel for initializing a Plateau
 	private Panel createPlateauPanel() {
+
 		TextField width = new TextField("width");
 		TextField height = new TextField("height");
 		Button submit = new Button("Create Plateau");
@@ -164,7 +186,7 @@ public class PlateauGUI extends UI {
 
 		return grid;
 	}
-	
+
 	@Override
 	public void close() {
 		plateauSummaryDataProvider.close();
