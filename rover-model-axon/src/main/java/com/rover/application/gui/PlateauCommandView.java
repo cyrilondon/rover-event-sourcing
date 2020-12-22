@@ -116,7 +116,7 @@ public class PlateauCommandView extends VerticalLayout {
 				content.addClassName("notification-error-msg");
 				content.setText(String.format("%s [entity Plateau could not be created]", ex.getMessage()));
 				Notification notification = new Notification(content);
-				notification.setDuration(3000);
+				notification.setDuration(2000);
 				notification.setPosition(Position.TOP_CENTER);
 				notification.open();
 

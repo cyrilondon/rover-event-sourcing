@@ -52,7 +52,7 @@
 		<axon.version>4.4.5</axon.version>
 
 		<vaadin.version>14.4.4</vaadin.version>
-		  <vaadin.productionMode>true</vaadin.productionMode>
+		<vaadin.productionMode>true</vaadin.productionMode>
 		<lombok.version>1.18.16</lombok.version>
 	</properties>
 
@@ -161,6 +161,13 @@
 			<groupId>org.vaadin.artur</groupId>
 			<artifactId>a-vaadin-helper</artifactId>
 			<version>1.5.0</version>
+		</dependency>
+
+		<!-- apex charts -->
+		<dependency>
+			<groupId>com.github.appreciated</groupId>
+			<artifactId>apexcharts</artifactId>
+			<version>2.0.0.beta10</version>
 		</dependency>
 
 
@@ -281,20 +288,20 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-maven-plugin</artifactId>
-                <version>2.4.3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build-frontend</goal>
-                        </goals>
-                        <phase>compile</phase>
-                    </execution>
-                </executions>
-            </plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>flow-maven-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build-frontend</goal>
+						</goals>
+						<phase>compile</phase>
+					</execution>
+				</executions>
+			</plugin>
 
 		</plugins>
 	</build>
