@@ -20,9 +20,9 @@ import com.rover.domain.query.FindAllPlateauSummaryQuery;
 import com.rover.domain.query.PlateauCountChangedUpdate;
 import com.rover.domain.query.PlateauSummary;
 import com.rover.domain.query.PlateauSummaryFilter;
-import com.vaadin.data.provider.AbstractBackEndDataProvider;
-import com.vaadin.data.provider.DataChangeEvent;
-import com.vaadin.data.provider.Query;
+import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
+import com.vaadin.flow.data.provider.DataChangeEvent;
+import com.vaadin.flow.data.provider.Query;
 
 @Component
 public class PlateauSummaryDataProvider extends AbstractBackEndDataProvider<PlateauSummary, Void> implements Closeable {
@@ -101,7 +101,8 @@ public class PlateauSummaryDataProvider extends AbstractBackEndDataProvider<Plat
 		// buffer the update every 250 ms
 		countQueryResult.updates().buffer(Duration.ofMillis(250)).subscribe(plateauCountChangedUpdate -> {
 			logger.debug("processing query update for {}: {}", countPlateauSummaryQuery, plateauCountChangedUpdate);
-			executorService.execute(() -> fireEvent(new DataChangeEvent<>(this)));
+			executorService.execute(() -> refreshAll());
+			
 		});
 
 		/*
