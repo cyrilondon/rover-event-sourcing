@@ -9,13 +9,36 @@
 	<version>HEAD</version>
 	<name>Rover Model Project</name>
 	<description>Axon Framework demo project for event sourcing</description>
-	
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.4.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+
+	<repositories>
+		<!-- The order of definitions matters. Explicitly defining central here 
+			to make sure it has the highest priority. -->
+
+		<!-- Main Maven repository -->
+		<repository>
+			<id>central</id>
+			<url>https://repo.maven.apache.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<!-- Repository used by many Vaadin add-ons -->
+		<repository>
+			<id>Vaadin Directory</id>
+			<url>https://maven.vaadin.com/vaadin-addons</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,10 +51,10 @@
 
 		<axon.version>4.4.5</axon.version>
 
-		<vaadin.version>8.2.0</vaadin.version>
+		<vaadin.version>14.4.4</vaadin.version>
 		<lombok.version>1.18.16</lombok.version>
 	</properties>
-	
+
 	<dependencyManagement>
 
 		<dependencies>
@@ -47,20 +70,15 @@
 		</dependencies>
 
 	</dependencyManagement>
-	
+
 
 	<dependencies>
-	
-	    <!-- DTO application module -->
-	    <!--  
-		<dependency>
-			<groupId>com.cyrilondon</groupId>
-			<artifactId>rover-dto-axon</artifactId>
-			<version>HEAD</version>
-		</dependency>
-		-->
-	
-	
+
+		<!-- DTO application module -->
+		<!-- <dependency> <groupId>com.cyrilondon</groupId> <artifactId>rover-dto-axon</artifactId> 
+			<version>HEAD</version> </dependency> -->
+
+
 		<!-- Axon -->
 		<dependency>
 			<groupId>org.axonframework</groupId>
@@ -73,7 +91,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- Vanilla Spring Boot to start with -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -85,13 +103,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		
+
 		<!-- Spring Boot web for Rest endpoints -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		
+
 		<!-- Swagger -->
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -110,7 +128,7 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<!-- This will of course be an Axon application. We're adding Kotlin to 
 			easily write command and event classes. -->
 		<dependency>
@@ -121,29 +139,31 @@
 			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-reflect</artifactId>
 		</dependency>
-		
+
 		<dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.axonframework.extensions.reactor</groupId>
-            <artifactId>axon-reactor-spring-boot-starter</artifactId>
-            <version>4.4.2</version>
-        </dependency>
-		
-			<!-- Vaadin -->
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.axonframework.extensions.reactor</groupId>
+			<artifactId>axon-reactor-spring-boot-starter</artifactId>
+			<version>4.4.2</version>
+		</dependency>
+
+		<!-- Vaadin -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-push</artifactId>
+			<groupId>org.vaadin.artur</groupId>
+			<artifactId>a-vaadin-helper</artifactId>
+			<version>1.5.0</version>
 		</dependency>
-		
-		
+
+
+
 		<!-- Tests -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -162,13 +182,13 @@
 			<version>${axon.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
-		<!--  logs -->
+
+		<!-- logs -->
 		<dependency>
-        	<groupId>ch.qos.logback</groupId>
-        	<artifactId>logback-classic</artifactId>
-    	</dependency>
-		
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -181,36 +201,36 @@
 					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
-				 <artifactId>kotlin-maven-plugin</artifactId>
-				 <groupId>org.jetbrains.kotlin</groupId> 
-				 <executions> 
-					 <execution>
-				 		 <id>compile</id> 
-						 <goals>
-				 			<goal>compile</goal> 
-				 		</goals> 
-					 <configuration> 
-						 <sourceDirs> 
-							 <sourceDir>${project.basedir}/src/main/java</sourceDir> 
-						</sourceDirs>
-				 	</configuration> 
-				 	</execution>
-				  	<execution> 
-				 		 <id>test-compile</id> 
+				<artifactId>kotlin-maven-plugin</artifactId>
+				<groupId>org.jetbrains.kotlin</groupId>
+				<executions>
+					<execution>
+						<id>compile</id>
 						<goals>
-				 			<goal>test-compile</goal> 
-				 		</goals> 
-				 	<configuration>
-				  		<sourceDirs> 
-				  			<sourceDir>${project.basedir}/src/test/java</sourceDir> 
-						</sourceDirs> 
-					</configuration> 
-					</execution> 
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<sourceDirs>
+								<sourceDir>${project.basedir}/src/main/java</sourceDir>
+							</sourceDirs>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-compile</id>
+						<goals>
+							<goal>test-compile</goal>
+						</goals>
+						<configuration>
+							<sourceDirs>
+								<sourceDir>${project.basedir}/src/test/java</sourceDir>
+							</sourceDirs>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -244,7 +264,23 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
+
+			<!-- Take care of synchronizing java dependencies and imports in package.json 
+				and main.js files. It also creates webpack.config.js if not exists yet. -->
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-frontend</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 

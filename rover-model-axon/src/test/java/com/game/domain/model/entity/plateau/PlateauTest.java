@@ -68,7 +68,7 @@ public class PlateauTest {
 		UUID uuid = UUID.randomUUID();
 		int width = -2;
 		int height = width;
-		String expectedErrorMessage = "[ERR-001] Plateau width [-2] should be strictly positive, Plateau height [-2] should strictly positive";
+		String expectedErrorMessage = "[ERR-001] Plateau width [-2] should be strictly positive, Plateau height [-2] should be strictly positive";
 		fixture.given().when(new PlateauInitializeCmd(uuid, width, height))
 				.expectException(EntityValidationException.class).expectExceptionMessage(expectedErrorMessage);
 	}

@@ -29,7 +29,7 @@ public class GameExceptionLabels {
 
 	public static final String PLATEAU_NEGATIVE_WIDTH = "Plateau width [%d] should be strictly positive";
 
-	public static final String PLATEAU_NEGATIVE_HEIGHT = "Plateau height [%d] should strictly positive";
+	public static final String PLATEAU_NEGATIVE_HEIGHT = "Plateau height [%d] should be strictly positive";
 	
 	
 	

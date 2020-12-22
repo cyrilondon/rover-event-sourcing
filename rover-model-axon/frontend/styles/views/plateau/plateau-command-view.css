@@ -1,0 +1,12 @@
+hello-world-view,
+#hello-world-view {
+  display: block;
+  padding: 1em;
+}
+.notification-error-msg {
+    color: red;
+}
+
+.command-panel{
+   border: 2px solid #32a1ce;
+}
