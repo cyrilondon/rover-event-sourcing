@@ -14,8 +14,12 @@ public class GameExceptionLabels {
 	public static final String ERROR_CODE_AND_MESSAGE_PATTERN = "[%s] %s";
 
 	public static final String ERROR_MESSAGE_SEPARATION_PATTERN = "%s - %s";
+	
+	public static final String ENTITY_NOT_FOUND_ERROR_CODE = "ERR-000";
+	
+	public static final String ENTITY_VALIDATION_ERROR_CODE = "ERR-001";
 
-	public static final String ILLEGAL_ARGUMENT_CODE = "ERR-000";
+	public static final String ILLEGAL_ARGUMENT_CODE = "ERR-002";
 
 	public static final String PRE_CHECK_ERROR_MESSAGE = "Broken precondition: %s";
 
@@ -24,8 +28,6 @@ public class GameExceptionLabels {
 	public static final String MISSING_PLATEAU_CONFIGURATION = "Missing Plateau configuration";
 	
 	public static final String MISSING_PLATEAU_UUID = "Missing Plateau identifiant";
-
-	public static final String ENTITY_VALIDATION_ERROR_CODE = "ERR-001";
 
 	public static final String PLATEAU_NEGATIVE_WIDTH = "Plateau width [%d] should be strictly positive";
 

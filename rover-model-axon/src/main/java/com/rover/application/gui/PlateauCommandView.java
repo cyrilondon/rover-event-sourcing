@@ -3,10 +3,12 @@ package com.rover.application.gui;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.axonframework.modelling.command.AggregateNotFoundException;
 import org.axonframework.queryhandling.QueryGateway;
 
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
+import com.rover.domain.command.model.exception.GameExceptionLabels;
 import com.rover.domain.command.model.service.command.PlateauCommandMapper;
 import com.rover.domain.command.model.service.plateau.PlateauCommandService;
 import com.rover.domain.query.PlateauSummary;
@@ -42,15 +44,12 @@ public class PlateauCommandView extends VerticalLayout {
 
 	private PlateauSummaryDataProvider plateauSummaryDataProvider;
 
-	private final QueryGateway queryGateway;
-
 	public PlateauCommandView(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
 			PlateauSummaryDataProvider plateauSummaryDataProvider, QueryGateway queryGateway) {
 
 		this.plateauCommandService = plateauCommandService;
 		this.plateauCommandMapper = plateauCommandMapper;
 		this.plateauSummaryDataProvider = plateauSummaryDataProvider;
-		this.queryGateway = queryGateway;
 
 		Div createCmdDiv = createCmdDiv();
 		Div desactivateCmdDiv = desactivateCmdDiv();
@@ -96,7 +95,6 @@ public class PlateauCommandView extends VerticalLayout {
 	}
 
 	private Grid summaryGrid() {
-		plateauSummaryDataProvider = new PlateauSummaryDataProvider(queryGateway);
 		Grid<PlateauSummary> grid = new Grid<>();
 		Column<PlateauSummary> idColumn = grid.addColumn(PlateauSummary::getId).setHeader("Plateau ID");
 		grid.addColumn(PlateauSummary::getWidth).setHeader("Width");
@@ -143,9 +141,13 @@ public class PlateauCommandView extends VerticalLayout {
 		result.whenComplete((msg, ex) -> {
 			// show notification to the user
 			if (ex != null) {
+				String exMsg = ex.getMessage();
+				if (ex instanceof AggregateNotFoundException) {
+					exMsg = "[" + GameExceptionLabels.ENTITY_NOT_FOUND_ERROR_CODE + "] " + exMsg;
+				}
 				Div content = new Div();
 				content.addClassName("notification-error-msg");
-				content.setText(String.format(errorMsg, ex.getMessage()));
+				content.setText(String.format(errorMsg, exMsg));
 				Notification notification = new Notification(content);
 				notification.setDuration(2000);
 				notification.setPosition(Position.TOP_CENTER);
