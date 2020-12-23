@@ -37,6 +37,8 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Plateau Charts")
 public class PlateauChartsView extends HorizontalLayout {
 
+	private static final long serialVersionUID = 1L;
+
 	private final QueryGateway queryGateway;
 
 	List<PlateauSummary> plateauList = new ArrayList<>();
@@ -66,8 +68,8 @@ public class PlateauChartsView extends HorizontalLayout {
 		Div chartDiv = new Div();
 		int width = plateau.getWidth();
 		int height = plateau.getHeight();
-		String[] labels = IntStream.range(1, width+1).boxed().map(Object::toString).toArray(String[]::new);
-		Integer[] series = IntStream.range(1, width+1).boxed().map(e -> height).toArray(Integer[]::new);
+		String[] labels = IntStream.range(1, width + 1).boxed().map(Object::toString).toArray(String[]::new);
+		Integer[] series = IntStream.range(1, width + 1).boxed().map(e -> height).toArray(Integer[]::new);
 		ApexCharts areaChart = ApexChartsBuilder.get()
 				.withChart(ChartBuilder.get().withType(Type.area).withZoom(ZoomBuilder.get().withEnabled(false).build())
 						.build())
