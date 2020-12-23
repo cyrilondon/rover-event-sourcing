@@ -4,7 +4,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.axonframework.modelling.command.AggregateNotFoundException;
-import org.axonframework.queryhandling.QueryGateway;
 
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
@@ -45,7 +44,7 @@ public class PlateauCommandView extends VerticalLayout {
 	private PlateauSummaryDataProvider plateauSummaryDataProvider;
 
 	public PlateauCommandView(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
-			PlateauSummaryDataProvider plateauSummaryDataProvider, QueryGateway queryGateway) {
+			PlateauSummaryDataProvider plateauSummaryDataProvider) {
 
 		this.plateauCommandService = plateauCommandService;
 		this.plateauCommandMapper = plateauCommandMapper;
@@ -94,7 +93,7 @@ public class PlateauCommandView extends VerticalLayout {
 		return div;
 	}
 
-	private Grid summaryGrid() {
+	private Grid<PlateauSummary> summaryGrid() {
 		Grid<PlateauSummary> grid = new Grid<>();
 		Column<PlateauSummary> idColumn = grid.addColumn(PlateauSummary::getId).setHeader("Plateau ID");
 		grid.addColumn(PlateauSummary::getWidth).setHeader("Width");
