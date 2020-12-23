@@ -33,6 +33,8 @@ public class GameExceptionLabels {
 
 	public static final String PLATEAU_NEGATIVE_HEIGHT = "Plateau height [%d] should be strictly positive";
 	
+	public static final String PLATEAU_ALREADY_DESACTIVATED = "Plateau [%s] is already desactivated";
+	
 	
 	
 

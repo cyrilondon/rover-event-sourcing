@@ -148,13 +148,13 @@ public class PlateauCommandView extends VerticalLayout {
 				content.addClassName("notification-error-msg");
 				content.setText(String.format(errorMsg, exMsg));
 				Notification notification = new Notification(content);
-				notification.setDuration(2000);
+				notification.setDuration(3000);
 				notification.setPosition(Position.TOP_CENTER);
 				notification.open();
 
 			} else {
 				if (expectedResult) {
-					Notification.show(String.format(successMsg, msg.toString()), 2000, Position.TOP_CENTER);
+					Notification.show(String.format(successMsg, msg.toString()), 3000, Position.TOP_CENTER);
 				} else {
 					Notification.show(successMsg, 2000, Position.TOP_CENTER);
 				}

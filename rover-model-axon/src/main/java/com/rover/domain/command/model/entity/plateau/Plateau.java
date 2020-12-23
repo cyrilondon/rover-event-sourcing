@@ -66,6 +66,8 @@ public class Plateau implements TwoDimensionalSpace {
 	public void handle(PlateauDesactivateCmd cmd) {
 		logger.debug("handling {}", cmd);
 		// basic validation
+		ArgumentCheck.preNotNull(cmd.getId(), GameExceptionLabels.MISSING_PLATEAU_UUID);
+		plateauValidator.doValidateDesactivated(cmd, status);
 		// publishing the event
 		apply(new PlateauDesactivatedEvt(plateauId));
 	}

@@ -1,5 +1,6 @@
 package com.rover.domain.command.model.entity.plateau;
 
+import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
 import com.rover.domain.command.model.validation.EntityDefaultValidationNotificationHandler;
@@ -18,7 +19,14 @@ public class PlateauValidator implements EntityValidator {
 		if (cmd.getHeight() <= 0)
 			this.validationHandler
 					.handleError(String.format(GameExceptionLabels.PLATEAU_NEGATIVE_HEIGHT, cmd.getHeight()));
-		
+
+		validationHandler.checkValidationResult();
+	}
+
+	public void doValidateDesactivated(PlateauDesactivateCmd cmd, PlateauStatus status) {
+		if (status == PlateauStatus.INACTIVE)
+			this.validationHandler.handleError(String.format(GameExceptionLabels.PLATEAU_ALREADY_DESACTIVATED, cmd.getId().toString()));
+
 		validationHandler.checkValidationResult();
 	}
 
