@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 
-public interface PlateauCommandService {
+public interface PlateauService {
 	
 	public CompletableFuture<UUID> initializePlateau(PlateauInitializeCmd plateauInitializeCmd);
 	

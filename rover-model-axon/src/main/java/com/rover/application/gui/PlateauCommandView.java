@@ -9,7 +9,7 @@ import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
 import com.rover.domain.command.model.service.command.PlateauCommandMapper;
-import com.rover.domain.command.model.service.plateau.PlateauCommandService;
+import com.rover.domain.command.model.service.plateau.PlateauService;
 import com.rover.domain.query.PlateauSummary;
 import com.rover.domain.query.PlateauSummaryFilter;
 import com.vaadin.flow.component.Component;
@@ -37,13 +37,13 @@ public class PlateauCommandView extends VerticalLayout {
 
 	private static final long serialVersionUID = 1L;
 
-	private final PlateauCommandService plateauCommandService;
+	private final PlateauService plateauCommandService;
 
 	private final PlateauCommandMapper plateauCommandMapper;
 
 	private PlateauSummaryDataProvider plateauSummaryDataProvider;
 
-	public PlateauCommandView(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
+	public PlateauCommandView(PlateauService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
 			PlateauSummaryDataProvider plateauSummaryDataProvider) {
 
 		this.plateauCommandService = plateauCommandService;

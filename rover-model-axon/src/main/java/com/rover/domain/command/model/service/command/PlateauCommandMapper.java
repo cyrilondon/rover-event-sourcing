@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.rover.application.command.dto.plateau.PlateauInitializeCmdDto;
+import com.rover.application.command.dto.PlateauInitializeCmdDto;
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 

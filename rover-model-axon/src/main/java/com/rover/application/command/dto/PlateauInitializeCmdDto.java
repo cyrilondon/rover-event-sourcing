@@ -1,4 +1,4 @@
-package com.rover.application.command.dto.plateau;
+package com.rover.application.command.dto;
 
 public class PlateauInitializeCmdDto {
 	

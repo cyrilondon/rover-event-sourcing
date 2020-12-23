@@ -10,11 +10,11 @@ import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 
 @Service
-public class PlateauCommandServiceImpl implements PlateauCommandService {
+public class PlateauServiceImpl implements PlateauService {
 	
 	private final CommandPublisher commandPublisher;
 	
-	 public PlateauCommandServiceImpl(CommandPublisher commandPublisher) {
+	 public PlateauServiceImpl(CommandPublisher commandPublisher) {
 	        this.commandPublisher = commandPublisher;
 	    }
 

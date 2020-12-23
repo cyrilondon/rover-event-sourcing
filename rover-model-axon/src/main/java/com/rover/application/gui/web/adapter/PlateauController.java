@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rover.application.command.dto.plateau.PlateauInitializeCmdDto;
+import com.rover.application.command.dto.PlateauInitializeCmdDto;
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.command.model.service.command.PlateauCommandMapper;
-import com.rover.domain.command.model.service.plateau.PlateauCommandService;
+import com.rover.domain.command.model.service.plateau.PlateauService;
 import com.rover.domain.query.FindAllPlateauSummaryQuery;
 import com.rover.domain.query.FindPlateauSummaryQuery;
 import com.rover.domain.query.PlateauSummary;
@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
 @Api(value = "Plateau Commands", tags = "Plateau Commands")
 public class PlateauController {
 
-	private final PlateauCommandService plateauCommandService;
+	private final PlateauService plateauCommandService;
 
 	private final PlateauCommandMapper plateauCommandMapper;
 
@@ -41,7 +41,7 @@ public class PlateauController {
 
 	private final ReactorQueryGateway reactorQueryGateway;
 
-	public PlateauController(PlateauCommandService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
+	public PlateauController(PlateauService plateauCommandService, PlateauCommandMapper plateauCommandMapper,
 			QueryGateway queryGateway, ReactorQueryGateway reactorQueryGateway) {
 		this.plateauCommandService = plateauCommandService;
 		this.plateauCommandMapper = plateauCommandMapper;
