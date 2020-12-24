@@ -33,9 +33,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = "plateau_charts", layout = MainLayout.class)
-@PageTitle("Plateau Charts")
-public class PlateauChartsView extends HorizontalLayout {
+@Route(value = "charts", layout = MainLayout.class)
+@PageTitle("NASA Charts")
+public class ChartsView extends HorizontalLayout {
 
 	private static final long serialVersionUID = 1L;
 
@@ -43,10 +43,10 @@ public class PlateauChartsView extends HorizontalLayout {
 
 	List<PlateauSummary> plateauList = new ArrayList<>();
 
-	public PlateauChartsView(QueryGateway queryGateway) throws Exception {
+	public ChartsView(QueryGateway queryGateway) throws Exception {
 		this.queryGateway = queryGateway;
 		setHeightFull();
-		setId("plateau-charts-view");
+		setId("charts-view");
 		plateauList = findAll().get();
 		chartPlateauDiv().forEach(this::add);
 	}

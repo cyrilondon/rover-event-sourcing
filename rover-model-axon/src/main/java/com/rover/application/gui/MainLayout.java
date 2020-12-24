@@ -37,7 +37,9 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @Push
 public class MainLayout extends AppLayout {
 
-    private final Tabs menu;
+	private static final long serialVersionUID = 1L;
+	
+	private final Tabs menu;
     private H1 viewTitle;
 
     public MainLayout() {
@@ -87,7 +89,7 @@ public class MainLayout extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("Plateau Commands", PlateauCommandView.class), createTab("Plateau Charts", PlateauChartsView.class)};
+        return new Tab[]{createTab("NASA Commands", CommandView.class), createTab("NASA Charts", ChartsView.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {

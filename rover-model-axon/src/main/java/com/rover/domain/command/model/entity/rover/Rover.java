@@ -76,7 +76,7 @@ public class Rover {
 		this.id = evt.getId();
 		this.position = evt.getPosition();
 		this.orientation = evt.getOrientation();
-		logger.debug("new Rover id: {} with width {} and height {}", this.id, this.position, this.orientation);
+		logger.debug("new Rover id: {} with position {} and orientation {}", this.id, this.position, this.orientation);
 	}
 
 

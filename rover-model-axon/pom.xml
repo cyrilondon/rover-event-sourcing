@@ -43,14 +43,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<java.version>11</java.version>
 		<kotlin.version>1.4.20</kotlin.version>
-
 		<maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-
 		<axon.version>4.4.5</axon.version>
-
 		<vaadin.version>14.4.4</vaadin.version>
 		<vaadin.productionMode>true</vaadin.productionMode>
 		<lombok.version>1.18.16</lombok.version>
@@ -272,7 +268,11 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			 
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 
 			<!-- Take care of synchronizing java dependencies and imports in package.json 
 				and main.js files. It also creates webpack.config.js if not exists yet. -->

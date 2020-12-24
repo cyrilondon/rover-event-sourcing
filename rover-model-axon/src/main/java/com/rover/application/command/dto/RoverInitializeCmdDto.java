@@ -9,45 +9,74 @@ public class RoverInitializeCmdDto {
 	private String plateauUuid;
 	
 	private String roverName;
+	
+	private RoverInitializeCmdDto(Builder builder) {
+		this.roverName = builder.roverName;
+		this.plateauUuid = builder.plateauUuid;
+		this.abscissa = builder.abscissa;
+		this.ordinate = builder.ordinate;
+		this.orientation = builder.orientation;
+	}
 
 	public String getRoverName() {
 		return roverName;
-	}
-
-	public void setRoverName(String roverName) {
-		this.roverName = roverName;
 	}
 
 	public int getAbscissa() {
 		return abscissa;
 	}
 
-	public void setAbscissa(int abscissa) {
-		this.abscissa = abscissa;
-	}
-
 	public int getOrdinate() {
 		return ordinate;
-	}
-
-	public void setOrdinate(int ordinate) {
-		this.ordinate = ordinate;
 	}
 
 	public String getOrientation() {
 		return orientation;
 	}
 
-	public void setOrientation(String orientation) {
-		this.orientation = orientation;
-	}
-
 	public String getPlateauUuid() {
 		return plateauUuid;
 	}
+	
+	public static class Builder {
 
-	public void setPlateauUuid(String plateauUuid) {
-		this.plateauUuid = plateauUuid;
+		String roverName;
+
+		private int abscissa, ordinate;
+
+		String orientation;
+
+		String plateauUuid;
+
+		public Builder withName(String name) {
+			this.roverName = name;
+			return this;
+		}
+
+		public Builder withPlateauUuid(String uuid) {
+			this.plateauUuid = uuid;
+			return this;
+		}
+
+		public Builder withAbscissa(int x) {
+			this.abscissa = x;
+			return this;
+		}
+
+		public Builder withOrdinate(int y) {
+			this.ordinate = y;
+			return this;
+		}
+
+		public Builder withOrientation(String orientation) {
+			this.orientation = orientation;
+			return this;
+		}
+
+		public RoverInitializeCmdDto build() {
+			return new RoverInitializeCmdDto(this);
+		}
+
 	}
 
 }
