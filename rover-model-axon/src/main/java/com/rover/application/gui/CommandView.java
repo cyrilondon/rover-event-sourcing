@@ -67,9 +67,9 @@ public class CommandView extends VerticalLayout {
 
 		HorizontalLayout cmdLayout = new HorizontalLayout(createPlateauDiv(), desactivatePlateauDiv(),
 				createRoverDiv());
-
 		add(cmdLayout, summaryGrid());
 		
+		setSizeUndefined();
 		
 	}
 
@@ -150,7 +150,6 @@ public class CommandView extends VerticalLayout {
 		});
 		filterRow.getCell(idColumn).setComponent(idStartsWith);
 
-		grid.setSizeFull();
 		grid.setDataProvider(plateauSummaryDataProvider);
 		return grid;
 	}
