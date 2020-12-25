@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.rover.domain.api.RoverInitializeEvt;
+import com.rover.domain.command.model.entity.rover.RoverIdentifier;
 
 @Component
 public class RoverViewProjection {
@@ -24,12 +25,15 @@ public class RoverViewProjection {
 	public void on(RoverInitializeEvt event) {
 		logger.debug("projecting {}", event);
 
-		String roverId = event.getId().toString();
+		RoverIdentifier roverId = event.getId();
+		
+		PlateauSummary plateau = new PlateauSummary();
+		plateau.setId(roverId.getPlateauId().toString());
 		/*
 		 * Update our read model by inserting the new rover. This is done so that
 		 * upcoming regular (non-subscription) queries get correct data.
 		 */
-		repository.save(new RoverSummary(roverId, event.getOrientation().getValue(), event.getPosition().getAbscissa(), event.getPosition().getOrdinate()));
+		repository.save(new RoverSummary(roverId.getName(), plateau, event.getOrientation().getValue(), event.getPosition().getAbscissa(), event.getPosition().getOrdinate()));
 
 	}
 

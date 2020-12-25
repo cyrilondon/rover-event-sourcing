@@ -1,13 +1,18 @@
 package com.rover.domain.query;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class RoverSummary {
 	
 	@Id
-	String roverId;
+	String roverName;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	PlateauSummary plateau;
 	
 	String orientation;
 	
@@ -16,19 +21,29 @@ public class RoverSummary {
 	public RoverSummary(){	
 	}
 	
-	public RoverSummary(String roverId, String orientation, Integer abscissa, Integer ordinate) {
-		this.roverId = roverId;
+	public RoverSummary(String roverId, PlateauSummary plateau, String orientation, Integer abscissa, Integer ordinate) {
+		this.roverName = roverId;
+		this.plateau = plateau;
 		this.orientation = orientation;
 		this.abscissa = abscissa;
 		this.ordinate = ordinate;
 	}
 
+
+	public PlateauSummary getPlateau() {
+		return plateau;
+	}
+
+	public void setPlateau(PlateauSummary plateau) {
+		this.plateau = plateau;
+	}
+
 	public String getRoverId() {
-		return roverId;
+		return roverName;
 	}
 
 	public void setRoverId(String roverId) {
-		this.roverId = roverId;
+		this.roverName = roverId;
 	}
 
 	public String getOrientation() {

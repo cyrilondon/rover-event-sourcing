@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import javax.persistence.NamedQueries
+import javax.persistence.NamedQuery
+import javax.persistence.OneToMany
+import javax.persistence.CascadeType
+import javax.persistence.JoinColumn
 
 import com.rover.domain.command.model.entity.plateau.PlateauStatus;
 import org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry;
+
 
 @Entity
 @NamedQueries(
@@ -21,6 +25,14 @@ import org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry;
 data class PlateauSummary(@Id var id: String, var width: Int, var height: Int, var status: PlateauStatus) {
     constructor() : this("", 0, 0, PlateauStatus.ACTIVE)
 	
+	 @OneToMany(
+		mappedBy = "plateau",
+        cascade = [(CascadeType.ALL)],
+        orphanRemoval = true
+    )
+
+    private val rovers = mutableListOf<RoverSummary>()
+   
 	override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true
