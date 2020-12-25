@@ -1,7 +1,6 @@
 package com.rover.application.context;
 
 import com.rover.domain.command.model.entity.plateau.PlateauValidator;
-import com.rover.domain.command.model.entity.rover.RoverValidator;
 
 /**
  * Application context whose responsibility is to keep track of the game state.
@@ -33,7 +32,6 @@ public class GameContext {
 	private void configure() {
 		ServiceLocator locator = new ServiceLocator();
 		locator.loadEntityValidator(ServiceLocator.PLATEAU_VALIDATOR, new PlateauValidator());
-		locator.loadEntityValidator(ServiceLocator.ROVER_VALIDATOR, new RoverValidator());
 		ServiceLocator.load(locator);
 	}
 
@@ -49,9 +47,6 @@ public class GameContext {
 	public PlateauValidator getPlateauValidator() {
 		return ServiceLocator.getPlateauValidator();
 	}
-	
-	public RoverValidator getRoverValidator() {
-		return ServiceLocator.getRoverValidator();
-	}
+
 
 }

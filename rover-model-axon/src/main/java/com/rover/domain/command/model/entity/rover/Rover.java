@@ -11,7 +11,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.rover.application.context.GameContext;
+import com.rover.application.context.SpringGameContext;
 import com.rover.core.validation.ArgumentCheck;
 import com.rover.domain.api.RoverInitializeCmd;
 import com.rover.domain.api.RoverInitializeEvt;
@@ -24,7 +24,7 @@ public class Rover {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
-	private final RoverValidator roverValidator = GameContext.getInstance().getRoverValidator();
+	private final RoverValidator roverValidator;
 	
 	@AggregateIdentifier
 	private RoverIdentifier id;
@@ -36,29 +36,15 @@ public class Rover {
 	public Rover() {
 		// Required by Axon
 		logger.debug("Empty constructor invoked");
-	}
-
-	
-	/**
-	 * We add this constructor with a name parameter to keep track of a given Rover,
-	 * in the case of sending commands from sources/clients other than a file (
-	 * where the explore command follows immediately the initialize command). By
-	 * example, the command could ask for Rover_X to turn left or turn right well
-	 * after Rover_X has been initialized.
-	 * 
-	 * @param rover name
-	 * @param rover coordinates
-	 * @param rover orientation
-	 */
-	public Rover(RoverIdentifier id, TwoDimensionalCoordinates coordinates, Orientation orientation) {
-		this.id = ArgumentCheck.preNotNull(id, GameExceptionLabels.MISSING_ROVER_IDENTIFIER);
-		this.position = ArgumentCheck.preNotNull(coordinates, GameExceptionLabels.MISSING_ROVER_POSITION);
-		this.orientation = ArgumentCheck.preNotNull(orientation, GameExceptionLabels.MISSING_ROVER_ORIENTATION);
+		roverValidator = SpringGameContext.getBean(RoverValidator.class);
+		
 	}
 	
 	@CommandHandler
 	public Rover(RoverInitializeCmd cmd) {
 		logger.debug("handling {}", cmd);
+		// we need to inject the validator this way as we dont want to make the Rover model aggregate as a spring component
+		roverValidator = SpringGameContext.getBean(RoverValidator.class);
 		// basic validation
 		ArgumentCheck.preNotNull(cmd.getId(), GameExceptionLabels.MISSING_ROVER_IDENTIFIER);
 		ArgumentCheck.preNotNull(cmd.getPosition(), GameExceptionLabels.MISSING_ROVER_POSITION);

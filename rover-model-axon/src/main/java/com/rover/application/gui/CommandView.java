@@ -184,8 +184,8 @@ public class CommandView extends VerticalLayout {
 		CompletableFuture<RoverIdentifier> result = roverService.initializeRover(cmd);
 
 		try {
-			handleResult(result, String.format("Rover id [%s] successfully created", result.get().toString()),
-					"Aggregate Plateau could not be desactivated: %s", false);
+			handleResult(result, "Rover id [%s] successfully created", "Aggregate Rover could not be created: %s",
+					true);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}

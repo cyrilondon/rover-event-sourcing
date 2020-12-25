@@ -28,6 +28,11 @@ import com.rover.domain.query.PlateauSummaryFilter;
 import io.swagger.annotations.Api;
 import reactor.core.publisher.Mono;
 
+/**
+ * Vaadin by nature does not need REST Service as the 'client code' is on server side.
+ * Rest servlet are just here for illustration purpose
+ *
+ */
 @RestController
 @RequestMapping(value = "/plateau")
 @Api(value = "Plateau Commands", tags = "Plateau Commands")

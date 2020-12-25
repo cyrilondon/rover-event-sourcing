@@ -46,5 +46,11 @@ public class GameExceptionLabels {
 	public static final String ROVER_NEGATIVE_X = "Rover X-position [%d] should be strictly positive";
 
 	public static final String ROVER_NEGATIVE_Y = "Rover Y-position [%d] should be strictly positive";
+	
+	public static final String INITIALIZE_ROVER_NOT_ALLOWED = "It is not allowed to initialize a Rover. Please initialize the Plateau first.";
+	
+	public static final String ROVER_X_OUT_OF_PLATEAU = "Rover with X-position [%d] is out of the Plateau with width [%d]";
+	
+	public static final String ROVER_Y_OUT_OF_PLATEAU = "Rover with Y-position [%d] is out of the Plateau with height [%d]";
 
 }

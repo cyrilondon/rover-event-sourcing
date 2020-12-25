@@ -16,6 +16,11 @@ import com.rover.domain.command.model.service.rover.RoverService;
 
 import io.swagger.annotations.Api;
 
+/**
+ * Vaadin by nature does not need REST Service as the 'client code' is on server side.
+ * Rest servlet are just here for illustration purpose
+ *
+ */
 @RestController
 @RequestMapping(value = "/rover")
 @Api(value = "Rover Commands", tags = "Rover Commands")

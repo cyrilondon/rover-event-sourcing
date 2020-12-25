@@ -10,6 +10,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 import com.rover.domain.command.model.entity.plateau.PlateauStatus;
+import org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry;
 
 @Entity
 @NamedQueries(
@@ -49,6 +50,10 @@ class CountPlateauSummaryQuery(val filter: PlateauSummaryFilter = PlateauSummary
 class FindAllPlateauSummaryQuery(val offset: Int, val limit: Int, val filter: PlateauSummaryFilter){ override fun toString() : String = "FindAllPlateauSummaryQuery" }
 
 class PlateauCountChangedUpdate
+
+
+interface RoverSummaryRepository : JpaRepository<RoverSummary, String>
+
 
 
 
