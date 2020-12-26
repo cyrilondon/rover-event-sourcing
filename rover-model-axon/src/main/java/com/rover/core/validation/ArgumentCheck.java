@@ -1,6 +1,6 @@
 package com.rover.core.validation;
 
-import com.rover.core.util.StringUtils;
+import com.rover.core.util.Utils;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
 import com.rover.domain.command.model.exception.IllegalArgumentGameException;
 
@@ -27,7 +27,7 @@ public class ArgumentCheck {
 	}
 	
 	private static String requiresNotEmpty(final String string, final String message) {
-		if (!StringUtils.hasText(string)) throw new IllegalArgumentGameException(message);
+		if (!Utils.hasText(string)) throw new IllegalArgumentGameException(message);
 		return string;
 	}
 

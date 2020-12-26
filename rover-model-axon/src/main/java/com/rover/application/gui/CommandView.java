@@ -6,7 +6,8 @@ import java.util.concurrent.CompletableFuture;
 import org.axonframework.modelling.command.AggregateNotFoundException;
 
 import com.rover.application.command.dto.RoverInitializeCmdDto;
-import com.rover.core.util.StringUtils;
+import com.rover.application.gui.broadcaster.BroadCaster;
+import com.rover.core.util.Utils;
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.api.RoverInitializeCmd;
@@ -68,9 +69,8 @@ public class CommandView extends VerticalLayout {
 		HorizontalLayout cmdLayout = new HorizontalLayout(createPlateauDiv(), desactivatePlateauDiv(),
 				createRoverDiv());
 		add(cmdLayout, summaryGrid());
-		
+
 		setSizeUndefined();
-		
 	}
 
 	private Div createPlateauDiv() {
@@ -176,9 +176,9 @@ public class CommandView extends VerticalLayout {
 	private void sendCreateRoverCommand(String name, String plateauId, String abscissa, String ordinate,
 			String orientation) {
 		RoverInitializeCmdDto cmdDto = new RoverInitializeCmdDto.Builder().withName(name).withPlateauUuid(plateauId)
-				.withAbscissa(StringUtils.hasText(abscissa) ? Integer.parseInt(abscissa) : 0)
-				.withOrdinate(StringUtils.hasText(ordinate) ? Integer.parseInt(ordinate) : 0)
-				.withOrientation(orientation).build();
+				.withAbscissa(Utils.hasText(abscissa) ? Integer.parseInt(abscissa) : 0)
+				.withOrdinate(Utils.hasText(ordinate) ? Integer.parseInt(ordinate) : 0).withOrientation(orientation)
+				.build();
 		// send the command
 		RoverInitializeCmd cmd = roverCommandMapper.toRoverInitializeCmd(cmdDto);
 		CompletableFuture<RoverIdentifier> result = roverService.initializeRover(cmd);
@@ -186,6 +186,11 @@ public class CommandView extends VerticalLayout {
 		try {
 			handleResult(result, "Rover id [%s] successfully created", "Aggregate Rover could not be created: %s",
 					true);
+			String broadCastEvent = String.format(
+					"<BroadCastEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastEvt>",
+					name, plateauId, abscissa, ordinate);
+			// sends the message for reactive update of chart view
+			BroadCaster.broadcast(broadCastEvent);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}

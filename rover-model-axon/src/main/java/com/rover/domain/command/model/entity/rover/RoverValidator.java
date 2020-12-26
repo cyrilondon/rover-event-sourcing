@@ -6,10 +6,10 @@ import java.util.List;
 import org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry;
 import org.springframework.stereotype.Component;
 
+import com.rover.core.util.SerializeUtils;
 import com.rover.domain.api.DomainEventRepository;
 import com.rover.domain.api.RoverInitializeCmd;
 import com.rover.domain.command.model.entity.plateau.PlateauDto;
-import com.rover.domain.command.model.entity.plateau.PlateauUtils;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
 import com.rover.domain.command.model.validation.EntityValidator;
 import com.rover.domain.command.model.validation.ValidationNotificationHandler;
@@ -48,7 +48,7 @@ public class RoverValidator implements EntityValidator {
 			
 			DomainEventEntry plateau = plateaus.get(0);
 			String payload = new String(plateau.getPayload().getData(), StandardCharsets.UTF_8);
-			PlateauDto dto = PlateauUtils.readFromEvent(payload);
+			PlateauDto dto = SerializeUtils.readFromEvent(payload);
 			if (isXPositionOutOfBoard(cmd, dto)) {
 				notificationHandler.handleError(String.format(GameExceptionLabels.ROVER_X_OUT_OF_PLATEAU,
 						cmd.getPosition().getAbscissa(), dto.getWidth()));
