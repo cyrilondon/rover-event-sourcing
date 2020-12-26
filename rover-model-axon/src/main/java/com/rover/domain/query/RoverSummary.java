@@ -38,7 +38,7 @@ public class RoverSummary {
 		this.plateau = plateau;
 	}
 
-	public String getRoverId() {
+	public String getRoverName() {
 		return roverName;
 	}
 
