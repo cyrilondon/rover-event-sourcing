@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.rover.domain.command.model.entity.plateau.PlateauValidator;
-import com.rover.domain.command.model.entity.rover.RoverValidator;
 import com.rover.domain.command.model.validation.EntityValidator;
 
 /**
@@ -16,8 +15,6 @@ import com.rover.domain.command.model.validation.EntityValidator;
 public class ServiceLocator {
 
 	public static String PLATEAU_VALIDATOR = "plateau_validator";
-	
-	public static String ROVER_VALIDATOR = "rover_validator";
 
 	private Map<String, EntityValidator> entityValidators = new HashMap<>();
 
@@ -25,10 +22,6 @@ public class ServiceLocator {
 	
 	public static PlateauValidator getPlateauValidator() {
 		return (PlateauValidator) soleInstance.entityValidators.get(PLATEAU_VALIDATOR);
-	}
-	
-	public static RoverValidator getRoverValidator() {
-		return (RoverValidator) soleInstance.entityValidators.get(ROVER_VALIDATOR);
 	}
 
 	public static void load(ServiceLocator arg) {

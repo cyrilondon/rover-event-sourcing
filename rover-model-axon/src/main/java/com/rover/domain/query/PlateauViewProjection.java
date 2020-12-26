@@ -96,6 +96,17 @@ class PlateauViewProjection {
 		jpaQuery.setMaxResults(query.getLimit());
 		return jpaQuery.getResultList();
 	}
+	
+	@QueryHandler
+	public List<PlateauSummary> handle(FindAllPlateauWithRoverSummaryQuery query) {
+		logger.debug("handling {}", query);
+		TypedQuery<PlateauSummary> jpaQuery = entityManager.createNamedQuery("PlateauSummary.fetch.rovers",
+				PlateauSummary.class);
+		jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
+		jpaQuery.setFirstResult(query.getOffset());
+		jpaQuery.setMaxResults(query.getLimit());
+		return jpaQuery.getResultList();
+	}
 
 	@QueryHandler
 	public Integer handle(CountPlateauSummaryQuery query) {

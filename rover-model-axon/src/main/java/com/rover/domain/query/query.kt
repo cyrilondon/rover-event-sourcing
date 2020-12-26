@@ -20,6 +20,8 @@ import org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry;
 @NamedQueries(
         NamedQuery(name = "PlateauSummary.fetch",
                 query = "SELECT c FROM PlateauSummary c WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.id"),
+        NamedQuery(name = "PlateauSummary.fetch.rovers",
+                query = "SELECT c FROM PlateauSummary c left join fetch c.rovers WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.id"),
         NamedQuery(name = "PlateauSummary.count",
                 query = "SELECT COUNT(c) FROM PlateauSummary c WHERE c.id LIKE CONCAT(:idStartsWith, '%')"))
 data class PlateauSummary(@Id var id: String, var width: Int, var height: Int, var status: PlateauStatus) {
@@ -31,7 +33,7 @@ data class PlateauSummary(@Id var id: String, var width: Int, var height: Int, v
         orphanRemoval = true
     )
 
-    private val rovers = mutableListOf<RoverSummary>()
+    val rovers = mutableListOf<RoverSummary>()
    
 	override fun equals(other: Any?): Boolean {
         if (this === other) {
@@ -60,6 +62,7 @@ data class PlateauSummaryFilter(val idStartsWith: String = "")
 
 class CountPlateauSummaryQuery(val filter: PlateauSummaryFilter = PlateauSummaryFilter()) { override fun toString() : String = "CountPlateauSummariesQuery" }
 class FindAllPlateauSummaryQuery(val offset: Int, val limit: Int, val filter: PlateauSummaryFilter){ override fun toString() : String = "FindAllPlateauSummaryQuery" }
+class FindAllPlateauWithRoverSummaryQuery(val offset: Int, val limit: Int, val filter: PlateauSummaryFilter){ override fun toString() : String = "FindAllPlateauWithRoverSummaryQuery" }
 
 class PlateauCountChangedUpdate
 

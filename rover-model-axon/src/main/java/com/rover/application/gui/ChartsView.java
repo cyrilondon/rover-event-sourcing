@@ -25,9 +25,12 @@ import com.github.appreciated.apexcharts.config.stroke.Curve;
 import com.github.appreciated.apexcharts.config.subtitle.Align;
 import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
 import com.github.appreciated.apexcharts.helper.Series;
+import com.rover.domain.command.model.entity.rover.Rover;
 import com.rover.domain.query.FindAllPlateauSummaryQuery;
+import com.rover.domain.query.FindAllPlateauWithRoverSummaryQuery;
 import com.rover.domain.query.PlateauSummary;
 import com.rover.domain.query.PlateauSummaryFilter;
+import com.rover.domain.query.RoverSummary;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -52,7 +55,7 @@ public class ChartsView extends HorizontalLayout {
 	}
 
 	private CompletableFuture<List<PlateauSummary>> findAll() {
-		return queryGateway.query(new FindAllPlateauSummaryQuery(0, 20, new PlateauSummaryFilter("")),
+		return queryGateway.query(new FindAllPlateauWithRoverSummaryQuery(0, 20, new PlateauSummaryFilter("")),
 				ResponseTypes.multipleInstancesOf(PlateauSummary.class));
 	}
 
@@ -65,6 +68,8 @@ public class ChartsView extends HorizontalLayout {
 	}
 
 	private Div buildPlateauDiv(PlateauSummary plateau) {
+		
+		List<RoverSummary> rovers = plateauList.get(0).getRovers();
 		Div chartDiv = new Div();
 		int width = plateau.getWidth();
 		int height = plateau.getHeight();
