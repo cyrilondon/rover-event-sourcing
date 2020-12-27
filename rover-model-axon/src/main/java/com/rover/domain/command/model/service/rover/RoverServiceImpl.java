@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.rover.application.out.port.messaging.CommandPublisher;
 import com.rover.domain.api.RoverInitializeCmd;
+import com.rover.domain.api.RoverMoveCmd;
 import com.rover.domain.command.model.entity.rover.RoverIdentifier;
 
 @Service
@@ -20,6 +21,11 @@ public class RoverServiceImpl implements RoverService {
 	@Override
 	public CompletableFuture<RoverIdentifier> initializeRover(RoverInitializeCmd roverInitializeCmd) {
 		return commandPublisher.send(roverInitializeCmd);
+	}
+
+	@Override
+	public CompletableFuture<RoverIdentifier> moveRover(RoverMoveCmd roverMoveCmd) {
+		return commandPublisher.send(roverMoveCmd);
 	}
 
 }

@@ -14,6 +14,7 @@ import com.rover.core.util.Utils;
 import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.api.RoverInitializeCmd;
+import com.rover.domain.api.RoverMoveCmd;
 import com.rover.domain.command.model.entity.rover.Orientation;
 import com.rover.domain.command.model.entity.rover.RoverIdentifier;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
@@ -55,7 +56,7 @@ public class CommandView extends VerticalLayout {
 	private static final String ERROR = "error";
 
 	private static final String ERROR_MSG_CLASSNAME = "notification-error-msg";
-	
+
 	private static final String DIV_CMD_CLASSNAME = "command-panel";
 
 	private static final String BROADCAST_ROVER_CREATION_MSG = "<BroadCastEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastEvt>";
@@ -80,8 +81,8 @@ public class CommandView extends VerticalLayout {
 		this.roverCommandMapper = roverCommandMapper;
 		this.roverService = roverService;
 
-		HorizontalLayout cmdLayout = new HorizontalLayout(createPlateauDiv(), desactivatePlateauDiv(),
-				createRoverDiv());
+		HorizontalLayout cmdLayout = new HorizontalLayout(createPlateauDiv(), desactivatePlateauDiv(), createRoverDiv(),
+				moveRoverDiv());
 		add(cmdLayout, summaryGrid());
 
 		setSizeUndefined();
@@ -120,7 +121,7 @@ public class CommandView extends VerticalLayout {
 		TextField abscissa = new TextField("abscissa");
 		TextField ordinate = new TextField("ordinate");
 		ComboBox<String> orientationComboBox = new ComboBox<String>();
-		orientationComboBox.setLabel("Orientation");
+		orientationComboBox.setLabel("orientation");
 		orientationComboBox.setItems(Orientation.allValues());
 		Div orientationValue = new Div();
 		orientationComboBox.addValueChangeListener(event -> {
@@ -136,6 +137,29 @@ public class CommandView extends VerticalLayout {
 				abscissa.getValue(), ordinate.getValue(), orientationValue.getText()));
 
 		return addToCmdDiv(createSubmit, name, plateauId, orientationComboBox, abscissa, ordinate);
+	}
+
+	private Div moveRoverDiv() {
+		TextField name = new TextField("name");
+		TextField plateauId = new TextField("plateauId");
+		ComboBox<String> orientationComboBox = new ComboBox<String>();
+		orientationComboBox.setLabel("orientation");
+		orientationComboBox.setItems(Orientation.allValues());
+		Div orientationValue = new Div();
+		orientationComboBox.addValueChangeListener(event -> {
+			orientationValue.setText(event.getValue());
+		});
+		TextField steps = new TextField("steps forward");
+		Button moveSubmit = new Button("Move Rover");
+		setHorizontalComponentAlignment(Alignment.CENTER, moveSubmit, name, plateauId, orientationComboBox, steps);
+		setPadding(true);
+		setMargin(true);
+		setHeightFull();
+
+		moveSubmit.addClickListener(event -> sendMoveRoverCommand(name.getValue(), plateauId.getValue(),
+				orientationValue.getText(), steps.getValue()));
+
+		return addToCmdDiv(moveSubmit, name, plateauId, orientationComboBox, steps);
 	}
 
 	private Div addToCmdDiv(Component... components) {
@@ -180,7 +204,7 @@ public class CommandView extends VerticalLayout {
 			return;
 		}
 
-		// sned the command
+		// send the command
 		CompletableFuture<UUID> result = plateauService.initializePlateau(cmd);
 
 		// handle the result
@@ -246,6 +270,28 @@ public class CommandView extends VerticalLayout {
 					e.getMessage());
 			showErrorNotification(e.getMessage());
 		}
+	}
+
+	private void sendMoveRoverCommand(String name, String plateauId, String orientation, String steps) {
+
+		// prepare command
+		RoverMoveCmd cmd = null;
+		try {
+			cmd = new RoverMoveCmd(new RoverIdentifier(UUID.fromString(plateauId), name), Orientation.get(orientation),
+					Integer.valueOf(steps));
+		} catch (Exception e) {
+			showErrorNotification(e.getMessage());
+			logger.error("error during move rover command parsing", e.getMessage());
+			return;
+		}
+
+		// send command
+		CompletableFuture<RoverIdentifier> result = roverService.moveRover(cmd);
+
+		// handle the result of CompletableFuture
+		handleResult(result, String.format("Rover id [%s] successfully moved to new position with [%s] steps forward", cmd.getId(), cmd.getSteps()),
+				"Aggregate Rover could not be moved: %s", false);
+
 	}
 
 	private CompletableFuture<String> handleResult(CompletableFuture<?> result, String successMsg, String errorMsg,

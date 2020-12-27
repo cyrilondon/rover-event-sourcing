@@ -10,11 +10,18 @@ data class PlateauInitializedEvt(val id: UUID, val width: Int, val height: Int)
 
 data class PlateauDesactivatedEvt(val id: UUID)
 
-data class RoverInitializeEvt(
+data class RoverInitializedEvt(
 	val id: RoverIdentifier,
 	val position: TwoDimensionalCoordinates,
 	val orientation: Orientation
+)
+
+data class RoverMovedEvt(
+	val id: RoverIdentifier,
+	val orientation: Orientation,
+    val position: TwoDimensionalCoordinates
 ) 
+
 
 
 

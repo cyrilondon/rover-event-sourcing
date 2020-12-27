@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import com.rover.core.util.SerializeUtils;
 import com.rover.domain.api.DomainEventRepository;
-import com.rover.domain.api.RoverInitializeCmd;
 import com.rover.domain.command.model.entity.plateau.PlateauDto;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
 import com.rover.domain.command.model.validation.EntityValidator;
@@ -28,19 +27,20 @@ public class RoverValidator implements EntityValidator {
 		this.eventRepository = eventRepository;
 	}
 
-	protected void doValidate(RoverInitializeCmd cmd) {
+	
+	protected void doValidate(String plateauId, int abscissa, int ordinate) {
 
 		ValidationNotificationHandler notificationHandler = validationNotificationHandler();
 
-		List<DomainEventEntry> plateaus = eventRepository.findByAggregateIdentifier(cmd.getId().getPlateauId().toString());
+		List<DomainEventEntry> plateaus = eventRepository.findByAggregateIdentifier(plateauId);
 
-		if (isXPositionNegative(cmd))
+		if (isXPositionNegative(abscissa))
 			notificationHandler
-					.handleError(String.format(GameExceptionLabels.ROVER_NEGATIVE_X, cmd.getPosition().getAbscissa()));
+					.handleError(String.format(GameExceptionLabels.ROVER_NEGATIVE_X, abscissa));
 
-		if (isYPositionNegative(cmd))
+		if (isYPositionNegative(ordinate))
 			notificationHandler
-					.handleError(String.format(GameExceptionLabels.ROVER_NEGATIVE_Y, cmd.getPosition().getOrdinate()));
+					.handleError(String.format(GameExceptionLabels.ROVER_NEGATIVE_Y, ordinate));
 
 		if (plateaus.isEmpty()) {
 			notificationHandler.handleError(GameExceptionLabels.INITIALIZE_ROVER_NOT_ALLOWED);
@@ -49,14 +49,14 @@ public class RoverValidator implements EntityValidator {
 			DomainEventEntry plateau = plateaus.get(0);
 			String payload = new String(plateau.getPayload().getData(), StandardCharsets.UTF_8);
 			PlateauDto dto = SerializeUtils.readFromEvent(payload);
-			if (isXPositionOutOfBoard(cmd, dto)) {
+			if (isXPositionOutOfBoard(abscissa, dto)) {
 				notificationHandler.handleError(String.format(GameExceptionLabels.ROVER_X_OUT_OF_PLATEAU,
-						cmd.getPosition().getAbscissa(), dto.getWidth()));
+						abscissa, dto.getWidth()));
 			}
 			
-			if (isYPositionOutOfBoard(cmd, dto))
+			if (isYPositionOutOfBoard(ordinate, dto))
 				notificationHandler.handleError(String.format(GameExceptionLabels.ROVER_Y_OUT_OF_PLATEAU,
-						cmd.getPosition().getOrdinate(), dto.getHeight()));
+						ordinate, dto.getHeight()));
 			
 		}
 
@@ -64,20 +64,20 @@ public class RoverValidator implements EntityValidator {
 
 	}
 
-	private boolean isXPositionNegative(RoverInitializeCmd cmd) {
-		return cmd.getPosition().getAbscissa() < 0;
+	private boolean isXPositionNegative(int abscissa) {
+		return abscissa < 0;
 	}
 
-	private boolean isYPositionNegative(RoverInitializeCmd cmd) {
-		return cmd.getPosition().getOrdinate() < 0;
+	private boolean isYPositionNegative(int ordinate) {
+		return ordinate < 0;
 	}
 	
-	private boolean isXPositionOutOfBoard(RoverInitializeCmd cmd, PlateauDto plateau) {
-		return cmd.getPosition().getAbscissa() > plateau.getWidth();
+	private boolean isXPositionOutOfBoard(int abscissa, PlateauDto plateau) {
+		return abscissa > plateau.getWidth();
 	}
 	
-	private boolean isYPositionOutOfBoard(RoverInitializeCmd cmd, PlateauDto plateau) {
-		return cmd.getPosition().getOrdinate() > plateau.getHeight();
+	private boolean isYPositionOutOfBoard(int  ordinate, PlateauDto plateau) {
+		return ordinate > plateau.getHeight();
 	}
 	
 

@@ -2,6 +2,9 @@ package com.rover.domain.command.model.entity.dimensions;
 
 import java.util.Objects;
 
+import com.rover.domain.command.model.entity.rover.Orientation;
+
+
 public class TwoDimensionalCoordinates {
 
 	private int abscissa, ordinate;
@@ -9,6 +12,21 @@ public class TwoDimensionalCoordinates {
 	public TwoDimensionalCoordinates(int x, int y) {
 		this.abscissa = x;
 		this.ordinate = y;
+	}
+	
+	/**
+	 * Given an initial orientation, shift the coordinates when asked to move forward
+	 * with a given step length 
+	 * @param orientation
+	 * @param stepLength
+	 * @return
+	 */
+	public TwoDimensionalCoordinates shiftWithOrientation(Orientation orientation, int stepLength) {
+		if (orientation.isHorizontal()) {
+			return shiftAlongAbscissa(stepLength * orientation.getAxisDirection());
+		} else {
+			return shiftAlongOrdinate(stepLength * orientation.getAxisDirection());
+		}
 	}
 
 	/**

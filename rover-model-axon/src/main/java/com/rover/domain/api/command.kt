@@ -19,6 +19,12 @@ data class RoverInitializeCmd(
 	val orientation: Orientation
 ) : DomainCommand
 
+data class RoverMoveCmd(
+	@TargetAggregateIdentifier val id: RoverIdentifier,
+	val orientation: Orientation,
+	val steps: Int
+) : DomainCommand
+
 
 
 
