@@ -1,9 +1,12 @@
 package com.rover.application.gui;
 
+import java.lang.invoke.MethodHandles;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.axonframework.modelling.command.AggregateNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.rover.application.command.dto.RoverInitializeCmdDto;
 import com.rover.application.gui.broadcaster.BroadCaster;
@@ -45,9 +48,17 @@ import com.vaadin.flow.router.RouteAlias;
 public class CommandView extends VerticalLayout {
 
 	private static final long serialVersionUID = 1L;
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
 	private static final String SUCCESS = "success";
 	private static final String ERROR = "error";
+
+	private static final String ERROR_MSG_CLASSNAME = "notification-error-msg";
+	
+	private static final String DIV_CMD_CLASSNAME = "command-panel";
+
+	private static final String BROADCAST_ROVER_CREATION_MSG = "<BroadCastEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastEvt>";
 
 	private final PlateauService plateauService;
 
@@ -132,7 +143,7 @@ public class CommandView extends VerticalLayout {
 		VerticalLayout createCmdLayout = new VerticalLayout();
 		createCmdLayout.add(components);
 		div.add(createCmdLayout);
-		div.setClassName("command-panel");
+		div.setClassName(DIV_CMD_CLASSNAME);
 		return div;
 	}
 
@@ -158,46 +169,82 @@ public class CommandView extends VerticalLayout {
 	}
 
 	private void sendInitializePlateauCommand(String width, String height) {
-		// send the command
-		PlateauInitializeCmd cmd = plateauCommandMapper.toPlateauInitializeCmd(Integer.parseInt(width),
-				Integer.parseInt(height));
+
+		// prepare the command
+		PlateauInitializeCmd cmd = null;
+		try {
+			cmd = plateauCommandMapper.toPlateauInitializeCmd(Integer.parseInt(width), Integer.parseInt(height));
+		} catch (Exception e) {
+			showErrorNotification(e.getMessage());
+			logger.error("error during initialize plateau command parsing", e.getMessage());
+			return;
+		}
+
+		// sned the command
 		CompletableFuture<UUID> result = plateauService.initializePlateau(cmd);
 
+		// handle the result
 		handleResult(result, "Plateau id [%s] successfully created", "Aggregate Plateau could not be created: %s",
 				true);
 	}
 
 	private void sendDesactivatePlateauCommand(String plateauId) {
+
+		// prepare and validate the command
+		PlateauDesactivateCmd cmd = null;
+		try {
+			cmd = plateauCommandMapper.toPlateauDesactivateCmd(plateauId);
+		} catch (Exception e) {
+			showErrorNotification(e.getMessage());
+			logger.error("error during desactivate plateau command parsing", e.getMessage());
+			return;
+		}
+
 		// send the command
-		PlateauDesactivateCmd cmd = plateauCommandMapper.toPlateauDesactivateCmd(plateauId);
 		CompletableFuture<UUID> result = plateauService.desactivatePlateau(cmd);
 
+		// handle the result of CompletableFuture
 		handleResult(result, String.format("Plateau id [%s] successfully desactivated", plateauId),
 				"Aggregate Plateau could not be desactivated: %s", false);
 	}
 
 	private void sendCreateRoverCommand(String name, String plateauId, String abscissa, String ordinate,
 			String orientation) {
-		RoverInitializeCmdDto cmdDto = new RoverInitializeCmdDto.Builder().withName(name).withPlateauUuid(plateauId)
-				.withAbscissa(Utils.hasText(abscissa) ? Integer.parseInt(abscissa) : 0)
-				.withOrdinate(Utils.hasText(ordinate) ? Integer.parseInt(ordinate) : 0).withOrientation(orientation)
-				.build();
+
+		RoverInitializeCmd cmd = null;
+		try {
+			// prepare and validate the command
+			RoverInitializeCmdDto cmdDto = new RoverInitializeCmdDto.Builder().withName(name).withPlateauUuid(plateauId)
+					.withAbscissa(Utils.hasText(abscissa) ? Integer.parseInt(abscissa) : 0)
+					.withOrdinate(Utils.hasText(ordinate) ? Integer.parseInt(ordinate) : 0).withOrientation(orientation)
+					.build();
+
+			cmd = roverCommandMapper.toRoverInitializeCmd(cmdDto);
+		} catch (Exception e) {
+			showErrorNotification(e.getMessage());
+			logger.error("error during create rover command parsing", e.getMessage());
+			return;
+		}
+
 		// send the command
-		RoverInitializeCmd cmd = roverCommandMapper.toRoverInitializeCmd(cmdDto);
 		CompletableFuture<RoverIdentifier> result = roverService.initializeRover(cmd);
 
+		// handle result
 		try {
 			CompletableFuture<String> finalResult = handleResult(result, "Rover id [%s] successfully created",
 					"Aggregate Rover could not be created: %s", true);
-			if (finalResult.get().equals("success")) {
-				String broadCastEvent = String.format(
-						"<BroadCastEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastEvt>",
-						name, plateauId, abscissa, ordinate);
+			// send a rover broadcast messages to listening UIs for reactive update (in this
+			// case, it will add a Bubble in the Charts View)
+			if (finalResult.get().equals(SUCCESS)) {
+				String broadCastEvent = String.format(BROADCAST_ROVER_CREATION_MSG, name, plateauId, abscissa,
+						ordinate);
 				// sends the message for reactive update of chart view
 				BroadCaster.broadcast(broadCastEvent);
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+			logger.error("unexpected technical error during procssing the response of  rover creation command parsing",
+					e.getMessage());
+			showErrorNotification(e.getMessage());
 		}
 	}
 
@@ -211,13 +258,7 @@ public class CommandView extends VerticalLayout {
 				if (ex instanceof AggregateNotFoundException) {
 					exMsg = "[" + GameExceptionLabels.ENTITY_NOT_FOUND_ERROR_CODE + "] " + exMsg;
 				}
-				Div content = new Div();
-				content.addClassName("notification-error-msg");
-				content.setText(String.format(errorMsg, exMsg));
-				Notification notification = new Notification(content);
-				notification.setDuration(3000);
-				notification.setPosition(Position.TOP_CENTER);
-				notification.open();
+				showErrorNotification(String.format(errorMsg, exMsg));
 				return ERROR;
 
 			} else {
@@ -230,5 +271,15 @@ public class CommandView extends VerticalLayout {
 			}
 		});
 		return finalResult;
+	}
+
+	private void showErrorNotification(String errorMsg) {
+		Div content = new Div();
+		content.addClassName(ERROR_MSG_CLASSNAME);
+		content.setText(errorMsg);
+		Notification notification = new Notification(content);
+		notification.setDuration(3000);
+		notification.setPosition(Position.TOP_CENTER);
+		notification.open();
 	}
 }
