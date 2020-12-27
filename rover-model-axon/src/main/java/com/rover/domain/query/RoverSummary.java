@@ -4,8 +4,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 
 @Entity
+@NamedQuery(
+	    name = "RoverSummary.findByNameAndPlateau",
+	    query = "SELECT r FROM RoverSummary r where r.roverName =:roverName and r.plateau.id =:plateauId")
 public class RoverSummary {
 	
 	@Id

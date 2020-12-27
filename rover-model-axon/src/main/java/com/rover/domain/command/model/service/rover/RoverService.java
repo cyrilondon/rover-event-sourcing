@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import com.rover.domain.api.RoverInitializeCmd;
 import com.rover.domain.api.RoverMoveCmd;
 import com.rover.domain.command.model.entity.rover.RoverIdentifier;
+import com.rover.domain.query.RoverSummary;
 
 public interface RoverService {
 	
@@ -12,4 +13,5 @@ public interface RoverService {
 	
 	public CompletableFuture<RoverIdentifier> moveRover(RoverMoveCmd roverMoveCmd);
 
+	RoverSummary  findRoverById(String roverName, String plateauId);
 }

@@ -24,6 +24,7 @@ import com.rover.domain.command.model.service.plateau.PlateauService;
 import com.rover.domain.command.model.service.rover.RoverService;
 import com.rover.domain.query.PlateauSummary;
 import com.rover.domain.query.PlateauSummaryFilter;
+import com.rover.domain.query.RoverSummary;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -59,7 +60,9 @@ public class CommandView extends VerticalLayout {
 
 	private static final String DIV_CMD_CLASSNAME = "command-panel";
 
-	private static final String BROADCAST_ROVER_CREATION_MSG = "<BroadCastEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastEvt>";
+	private static final String BROADCAST_ROVER_CREATION_MSG = "<BroadCastCreateEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastCreateEvt>";
+	
+	private static final String BROADCAST_ROVER_MOVED_MSG = "<BroadCastMovedEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastMovedEvt>";
 
 	private final PlateauService plateauService;
 
@@ -289,8 +292,26 @@ public class CommandView extends VerticalLayout {
 		CompletableFuture<RoverIdentifier> result = roverService.moveRover(cmd);
 
 		// handle the result of CompletableFuture
-		handleResult(result, String.format("Rover id [%s] successfully moved to new position with [%s] steps forward", cmd.getId(), cmd.getSteps()),
-				"Aggregate Rover could not be moved: %s", false);
+		try {
+			CompletableFuture<String> finalResult = handleResult(result,
+					String.format("Rover id [%s] successfully moved to new position with [%s] steps forward",
+							cmd.getId(), cmd.getSteps()),
+					"Aggregate Rover could not be moved: %s", false);
+			// send a rover broadcast messages to listening UIs for reactive update (in this
+			// case, it will add a Bubble in the Charts View)
+			if (finalResult.get().equals(SUCCESS)) {
+				RoverSummary rover = roverService.findRoverById(cmd.getId().getName(),
+						cmd.getId().getPlateauId().toString());
+				String broadCastEvent = String.format(BROADCAST_ROVER_MOVED_MSG, rover.getRoverName(),
+						rover.getPlateau().getId(), rover.getAbscissa(), rover.getOrdinate());
+				// sends the message for reactive update of chart view
+				BroadCaster.broadcast(broadCastEvent);
+			}
+		} catch (Exception e) {
+			logger.error("unexpected technical error during procssing the response of  rover creation command parsing",
+					e.getMessage());
+			showErrorNotification(e.getMessage());
+		}
 
 	}
 
