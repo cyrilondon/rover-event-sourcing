@@ -45,6 +45,9 @@ import com.vaadin.flow.router.RouteAlias;
 public class CommandView extends VerticalLayout {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final String SUCCESS = "success";
+	private static final String ERROR = "error";
 
 	private final PlateauService plateauService;
 
@@ -184,21 +187,24 @@ public class CommandView extends VerticalLayout {
 		CompletableFuture<RoverIdentifier> result = roverService.initializeRover(cmd);
 
 		try {
-			handleResult(result, "Rover id [%s] successfully created", "Aggregate Rover could not be created: %s",
-					true);
-			String broadCastEvent = String.format(
-					"<BroadCastEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastEvt>",
-					name, plateauId, abscissa, ordinate);
-			// sends the message for reactive update of chart view
-			BroadCaster.broadcast(broadCastEvent);
+			CompletableFuture<String> finalResult = handleResult(result, "Rover id [%s] successfully created",
+					"Aggregate Rover could not be created: %s", true);
+			if (finalResult.get().equals("success")) {
+				String broadCastEvent = String.format(
+						"<BroadCastEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastEvt>",
+						name, plateauId, abscissa, ordinate);
+				// sends the message for reactive update of chart view
+				BroadCaster.broadcast(broadCastEvent);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 
-	private void handleResult(CompletableFuture<?> result, String successMsg, String errorMsg, boolean expectedResult) {
+	private CompletableFuture<String> handleResult(CompletableFuture<?> result, String successMsg, String errorMsg,
+			boolean expectedResult) {
 		// show notification to the user
-		result.whenComplete((msg, ex) -> {
+		CompletableFuture<String> finalResult = result.handle((msg, ex) -> {
 			// show notification to the user
 			if (ex != null) {
 				String exMsg = ex.getMessage();
@@ -212,6 +218,7 @@ public class CommandView extends VerticalLayout {
 				notification.setDuration(3000);
 				notification.setPosition(Position.TOP_CENTER);
 				notification.open();
+				return ERROR;
 
 			} else {
 				if (expectedResult) {
@@ -219,7 +226,9 @@ public class CommandView extends VerticalLayout {
 				} else {
 					Notification.show(successMsg, 2000, Position.TOP_CENTER);
 				}
+				return SUCCESS;
 			}
 		});
+		return finalResult;
 	}
 }

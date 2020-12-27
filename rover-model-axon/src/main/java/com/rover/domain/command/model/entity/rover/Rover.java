@@ -44,6 +44,7 @@ public class Rover {
 	public Rover(RoverInitializeCmd cmd) {
 		logger.debug("handling {}", cmd);
 		// we need to inject the validator this way as we dont want to make the Rover model aggregate as a spring component
+		// and the validator contains the EventRepository Spring Data repository
 		roverValidator = SpringGameContext.getBean(RoverValidator.class);
 		// basic validation
 		ArgumentCheck.preNotNull(cmd.getId(), GameExceptionLabels.MISSING_ROVER_IDENTIFIER);
