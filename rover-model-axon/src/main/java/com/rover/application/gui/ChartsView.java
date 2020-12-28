@@ -141,6 +141,15 @@ public class ChartsView extends VerticalLayout {
 		UI ui = attachEvent.getUI();
 		broadcasterRegistration = BroadCaster.register(newMessage -> {
 			ui.access(() -> {
+				
+				try {
+					// needed to make sure the last event has been persisted
+					// as the broadcast msg is sent once the command has been sent (and not the event persisted)
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				if (newMessage.contains("Move")) {
 					RoverInitializedBroadCastEventDto dto = SerializeUtils.readFromBroadCast(newMessage);
@@ -149,19 +158,20 @@ public class ChartsView extends VerticalLayout {
 					Series<Double[]> seriesToAdd = toSeries(roverMoved);
 					
 					// add rover series to current state
-					plateauToSeries.putIfAbsent(dto.getPlateauId(), new TreeMap<>());
-					Map<String, Series<Double[]>> roverToSeries = plateauToSeries.get(dto.getPlateauId());
-					roverToSeries.put(dto.getName(), seriesToAdd);
+					String plateauId = roverMoved.getPlateau().getId();
+					plateauToSeries.putIfAbsent(plateauId, new TreeMap<>());
+					Map<String, Series<Double[]>> roverToSeries = plateauToSeries.get(plateauId);
+					roverToSeries.put(roverMoved.getRoverName(), seriesToAdd);
 
 					// update bubbleChart with current state and sorted by roverName
 					List<Series<Double[]>> series = roverToSeries.values().stream()
 							.sorted((s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName()))
 							.collect(Collectors.toList());
-					ApexCharts bubbleChart = plateauToChart.get(dto.getPlateauId());
+					ApexCharts bubbleChart = plateauToChart.get(plateauId);
 					bubbleChart.updateSeries(series.toArray(new Series[series.size()]));
 					
 					// show notification of new bubble
-					Notification.show(String.format("A rover has just been moved %s", dto), 3000, Position.TOP_CENTER);
+					Notification.show(String.format("A rover has just been moved %s", roverMoved), 3000, Position.TOP_CENTER);
 
 				} else {
 

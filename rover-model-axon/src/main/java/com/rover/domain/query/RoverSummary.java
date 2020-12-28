@@ -7,32 +7,30 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 
 @Entity
-@NamedQuery(
-	    name = "RoverSummary.findByNameAndPlateau",
-	    query = "SELECT r FROM RoverSummary r where r.roverName =:roverName and r.plateau.id =:plateauId")
+@NamedQuery(name = "RoverSummary.findByNameAndPlateau", query = "SELECT r FROM RoverSummary r where r.roverName =:roverName and r.plateau.id =:plateauId")
 public class RoverSummary {
-	
+
 	@Id
 	String roverName;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	PlateauSummary plateau;
-	
+
 	String orientation;
-	
+
 	Integer abscissa, ordinate;
-	
-	public RoverSummary(){	
+
+	public RoverSummary() {
 	}
-	
-	public RoverSummary(String roverId, PlateauSummary plateau, String orientation, Integer abscissa, Integer ordinate) {
+
+	public RoverSummary(String roverId, PlateauSummary plateau, String orientation, Integer abscissa,
+			Integer ordinate) {
 		this.roverName = roverId;
 		this.plateau = plateau;
 		this.orientation = orientation;
 		this.abscissa = abscissa;
 		this.ordinate = ordinate;
 	}
-
 
 	public PlateauSummary getPlateau() {
 		return plateau;
@@ -74,5 +72,9 @@ public class RoverSummary {
 		this.ordinate = ordinate;
 	}
 
+	public String toString() {
+		return String.format("name: %s, plateau: %s, orientation: %s, abscissa: %s, ordinate: %s ", roverName, plateau,
+				orientation, abscissa, ordinate);
+	}
 
 }
