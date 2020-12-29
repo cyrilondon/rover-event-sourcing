@@ -65,11 +65,11 @@ public class RoverValidator implements EntityValidator {
 	}
 
 	private boolean isXPositionNegative(int abscissa) {
-		return abscissa < 0;
+		return abscissa <= 0;
 	}
 
 	private boolean isYPositionNegative(int ordinate) {
-		return ordinate < 0;
+		return ordinate <= 0;
 	}
 	
 	private boolean isXPositionOutOfBoard(int abscissa, PlateauDto plateau) {

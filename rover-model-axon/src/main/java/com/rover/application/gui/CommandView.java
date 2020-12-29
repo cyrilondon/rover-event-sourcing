@@ -302,8 +302,8 @@ public class CommandView extends VerticalLayout {
 			if (finalResult.get().equals(SUCCESS)) {
 				RoverSummary rover = roverService.findRoverById(cmd.getId().getName(),
 						cmd.getId().getPlateauId().toString());
-				String broadCastEvent = String.format(BROADCAST_ROVER_MOVED_MSG, rover.getRoverName(),
-						rover.getPlateau().getId(), rover.getAbscissa(), rover.getOrdinate());
+				String broadCastEvent = String.format(BROADCAST_ROVER_MOVED_MSG, rover.getName(),
+						rover.getPlateauId(), rover.getAbscissa(), rover.getOrdinate());
 				// sends the message for reactive update of chart view
 				BroadCaster.broadcast(broadCastEvent);
 			}

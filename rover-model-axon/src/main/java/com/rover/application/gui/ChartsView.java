@@ -6,12 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
-import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.axonframework.queryhandling.QueryGateway;
 
 import com.github.appreciated.apexcharts.ApexCharts;
 import com.github.appreciated.apexcharts.ApexChartsBuilder;
@@ -29,10 +25,9 @@ import com.rover.application.gui.broadcaster.BroadCaster;
 import com.rover.core.util.SerializeUtils;
 import com.rover.core.util.Utils;
 import com.rover.domain.command.model.entity.rover.RoverInitializedBroadCastEventDto;
+import com.rover.domain.command.model.service.plateau.PlateauService;
 import com.rover.domain.command.model.service.rover.RoverService;
-import com.rover.domain.query.FindAllPlateauWithRoverSummaryQuery;
 import com.rover.domain.query.PlateauSummary;
-import com.rover.domain.query.PlateauSummaryFilter;
 import com.rover.domain.query.RoverSummary;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
@@ -56,8 +51,8 @@ public class ChartsView extends VerticalLayout {
 
 	private static final int PLATEAU_PER_ROW = 2;
 
-	private final QueryGateway queryGateway;
-	
+	private final PlateauService plateauService;
+
 	private final RoverService roverService;
 
 	private List<PlateauSummary> plateauList = new ArrayList<>();
@@ -68,16 +63,18 @@ public class ChartsView extends VerticalLayout {
 
 	private final Map<String, Map<String, Series<Double[]>>> plateauToSeries = new HashMap<>();
 
-	public ChartsView(QueryGateway queryGateway, RoverService roverService) throws Exception {
-		this.queryGateway = queryGateway;
+	public ChartsView(PlateauService plateauService, RoverService roverService)
+			throws Exception {
 		this.roverService = roverService;
+		this.plateauService = plateauService;
 		setId("charts-view");
 		buildPlateaus();
 		setSizeFull();
 	}
 
 	private void buildPlateaus() throws InterruptedException, ExecutionException {
-		plateauList = findAll().get();
+
+		plateauList = plateauService.findAll();
 
 		List<List<PlateauSummary>> plateau2list = Utils.nPartition(plateauList, PLATEAU_PER_ROW);
 		plateau2list.stream().forEach(list -> {
@@ -88,24 +85,37 @@ public class ChartsView extends VerticalLayout {
 		});
 	}
 
-	private CompletableFuture<List<PlateauSummary>> findAll() {
-		return queryGateway.query(new FindAllPlateauWithRoverSummaryQuery(0, 20, new PlateauSummaryFilter("")),
-				ResponseTypes.multipleInstancesOf(PlateauSummary.class));
-	}
-
 	private Div buildPlateauDiv(PlateauSummary plateau) {
 
+		Map<String, Series<Double[]>> roverSeries = new TreeMap<>();
+
+		List<RoverSummary> roversInPlateau = roverService.findRoversByPlateau(plateau.getId());
+		if (!roversInPlateau.isEmpty()) {
+			roverSeries.putAll(roversInPlateau.stream()
+					.collect(Collectors.toMap(RoverSummary::getName, rover -> toSeries(rover))));
+		}
+
+		ApexCharts bubbleChart = buildBubbleChart(plateau, roverSeries);
+
+		plateauToChart.put(plateau.getId(), bubbleChart);
+		plateauToSeries.put(plateau.getId(), roverSeries);
+
+		return addBubbleChartToDiv(bubbleChart);
+	}
+
+	private Div addBubbleChartToDiv(ApexCharts bubbleChart) {
+		Div chartDiv = new Div();
+		chartDiv.add(bubbleChart);
+		chartDiv.setWidth(WIDTH_PLATEAU);
+		return chartDiv;
+	}
+
+	private ApexCharts buildBubbleChart(PlateauSummary plateau, Map<String, Series<Double[]>> roverSeries) {
 		Title xtitle = new Title();
 		xtitle.setText("plateau width " + plateau.getWidth());
 
 		com.github.appreciated.apexcharts.config.yaxis.Title ytitle = new com.github.appreciated.apexcharts.config.yaxis.Title();
 		ytitle.setText("plateau height " + plateau.getHeight());
-
-		Map<String, Series<Double[]>> roverSeries = new TreeMap<>();
-		if (!plateau.getRovers().isEmpty()) {
-			roverSeries = new TreeMap<>(plateau.getRovers().stream()
-					.collect(Collectors.toMap(RoverSummary::getRoverName, rover -> toSeries(rover))));
-		}
 
 		ApexCharts bubbleChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.bubble)
 				.withZoom(ZoomBuilder.get().withEnabled(false).build()).withForeColor("hsl(214,100%,70%").build())
@@ -119,32 +129,35 @@ public class ChartsView extends VerticalLayout {
 				.withYaxis(YAxisBuilder.get().withMin(0.0).withMax(Double.valueOf(plateau.getHeight()))
 						.withTickAmount(Double.valueOf(plateau.getHeight())).withTitle(ytitle).build())
 				.build();
-
-		plateauToChart.put(plateau.getId(), bubbleChart);
-		plateauToSeries.put(plateau.getId(), roverSeries);
-
-		Div chartDiv = new Div();
-		chartDiv.add(bubbleChart);
-		chartDiv.setWidth(WIDTH_PLATEAU);
-		return chartDiv;
+		return bubbleChart;
 	}
-	
 
 	private Series<Double[]> toSeries(RoverSummary rover) {
-		return new Series<Double[]>(rover.getRoverName(),
+		return new Series<Double[]>(rover.getName(),
 				new Double[] { Double.valueOf(rover.getAbscissa()), Double.valueOf(rover.getOrdinate()), 30.0 },
 				new Double[] { Double.valueOf(rover.getAbscissa()), Double.valueOf(rover.getOrdinate()), 0.0 });
 	}
-
+	
+	private Series<Double[]> toSeries(RoverInitializedBroadCastEventDto broadCastMsgDto) {
+		return new Series<Double[]>(broadCastMsgDto.getName(),
+				new Double[] { Double.valueOf(broadCastMsgDto.getAbscissa()), Double.valueOf(broadCastMsgDto.getOrdinate()), 30.0 },
+				new Double[] { Double.valueOf(broadCastMsgDto.getAbscissa()), Double.valueOf(broadCastMsgDto.getOrdinate()), 0.0 });
+	}
+	
+	
+	/**
+	 * attach an event listener for message broadcasting when adding/moving a rover
+	 */
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
 		UI ui = attachEvent.getUI();
 		broadcasterRegistration = BroadCaster.register(newMessage -> {
 			ui.access(() -> {
-				
+
 				try {
 					// needed to make sure the last event has been persisted
-					// as the broadcast msg is sent once the command has been sent (and not the event persisted)
+					// as the broadcast msg is sent once the command has been sent (and not the
+					// event persisted)
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -154,14 +167,14 @@ public class ChartsView extends VerticalLayout {
 				if (newMessage.contains("Move")) {
 					RoverInitializedBroadCastEventDto dto = SerializeUtils.readFromBroadCast(newMessage);
 					RoverSummary roverMoved = roverService.findRoverById(dto.getName(), dto.getPlateauId());
-					
+
 					Series<Double[]> seriesToAdd = toSeries(roverMoved);
-					
+
 					// add rover series to current state
-					String plateauId = roverMoved.getPlateau().getId();
+					String plateauId = roverMoved.getPlateauId();
 					plateauToSeries.putIfAbsent(plateauId, new TreeMap<>());
 					Map<String, Series<Double[]>> roverToSeries = plateauToSeries.get(plateauId);
-					roverToSeries.put(roverMoved.getRoverName(), seriesToAdd);
+					roverToSeries.put(roverMoved.getName(), seriesToAdd);
 
 					// update bubbleChart with current state and sorted by roverName
 					List<Series<Double[]>> series = roverToSeries.values().stream()
@@ -169,22 +182,19 @@ public class ChartsView extends VerticalLayout {
 							.collect(Collectors.toList());
 					ApexCharts bubbleChart = plateauToChart.get(plateauId);
 					bubbleChart.updateSeries(series.toArray(new Series[series.size()]));
-					
+
 					// show notification of new bubble
-					Notification.show(String.format("A rover has just been moved %s", roverMoved), 3000, Position.TOP_CENTER);
+					Notification.show(String.format("A rover has just been moved %s", roverMoved), 3000,
+							Position.TOP_CENTER);
 
 				} else {
 
 					RoverInitializedBroadCastEventDto dto = SerializeUtils.readFromBroadCast(newMessage);
 					ApexCharts bubbleChart = plateauToChart.get(dto.getPlateauId());
 
-					Series<Double[]> seriesToAdd = new Series<Double[]>(dto.getName(),
-							new Double[] { Double.valueOf(dto.getAbscissa()), Double.valueOf(dto.getOrdinate()), 30.0 },
-							new Double[] { Double.valueOf(dto.getAbscissa()), Double.valueOf(dto.getOrdinate()), 0.0 });
-
 					// add rover series to current state
 					plateauToSeries.putIfAbsent(dto.getPlateauId(), new TreeMap<>());
-					plateauToSeries.get(dto.getPlateauId()).put(dto.getName(), seriesToAdd);
+					plateauToSeries.get(dto.getPlateauId()).put(dto.getName(), toSeries(dto));
 
 					// update bubbleChart with current state and sorted by roverName
 					List<Series<Double[]>> series = plateauToSeries.get(dto.getPlateauId()).values().stream()

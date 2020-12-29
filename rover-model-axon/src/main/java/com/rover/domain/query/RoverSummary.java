@@ -1,20 +1,15 @@
 package com.rover.domain.query;
 
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 
 @Entity
-@NamedQuery(name = "RoverSummary.findByNameAndPlateau", query = "SELECT r FROM RoverSummary r where r.roverName =:roverName and r.plateau.id =:plateauId")
+@NamedQuery(name = "RoverSummary.findByNameAndPlateau", query = "SELECT r FROM RoverSummary r where r.id.name =:roverName and r.id.plateauId =:plateauId")
 public class RoverSummary {
 
-	@Id
-	String roverName;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	PlateauSummary plateau;
+	@EmbeddedId
+	private RoverId id;
 
 	String orientation;
 
@@ -23,29 +18,25 @@ public class RoverSummary {
 	public RoverSummary() {
 	}
 
-	public RoverSummary(String roverId, PlateauSummary plateau, String orientation, Integer abscissa,
+	public RoverSummary(RoverId id, String orientation, Integer abscissa,
 			Integer ordinate) {
-		this.roverName = roverId;
-		this.plateau = plateau;
+		this.id = id;
 		this.orientation = orientation;
 		this.abscissa = abscissa;
 		this.ordinate = ordinate;
 	}
 
-	public PlateauSummary getPlateau() {
-		return plateau;
+	public String getPlateauId() {
+		return getId().getPlateauId();
 	}
 
-	public void setPlateau(PlateauSummary plateau) {
-		this.plateau = plateau;
+
+	public String getName() {
+		return getId().getName();
 	}
 
-	public String getRoverName() {
-		return roverName;
-	}
-
-	public void setRoverId(String roverId) {
-		this.roverName = roverId;
+	public RoverId getId() {
+		return id;
 	}
 
 	public String getOrientation() {
@@ -73,7 +64,7 @@ public class RoverSummary {
 	}
 
 	public String toString() {
-		return String.format("name: %s, plateau: %s, orientation: %s, abscissa: %s, ordinate: %s ", roverName, plateau,
+		return String.format("name: %s, plateau: %s, orientation: %s, abscissa: %s, ordinate: %s ", getName(), getPlateauId(),
 				orientation, abscissa, ordinate);
 	}
 

@@ -21,19 +21,11 @@ import org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry;
         NamedQuery(name = "PlateauSummary.fetch",
                 query = "SELECT c FROM PlateauSummary c WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.id"),
         NamedQuery(name = "PlateauSummary.fetch.rovers",
-                query = "SELECT c FROM PlateauSummary c left join fetch c.rovers WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.id"),
+                query = "SELECT c FROM PlateauSummary c WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.id"),
         NamedQuery(name = "PlateauSummary.count",
                 query = "SELECT COUNT(c) FROM PlateauSummary c WHERE c.id LIKE CONCAT(:idStartsWith, '%')"))
 data class PlateauSummary(@Id var id: String, var width: Int, var height: Int, var status: PlateauStatus) {
     constructor() : this("", 0, 0, PlateauStatus.ACTIVE)
-	
-	 @OneToMany(
-		mappedBy = "plateau",
-        cascade = [(CascadeType.ALL)],
-        orphanRemoval = true
-    )
-
-    val rovers = mutableListOf<RoverSummary>()
    
 	override fun equals(other: Any?): Boolean {
         if (this === other) {
@@ -67,7 +59,11 @@ class FindAllPlateauWithRoverSummaryQuery(val offset: Int, val limit: Int, val f
 class PlateauCountChangedUpdate
 
 
-interface RoverSummaryRepository : JpaRepository<RoverSummary, String>
+interface RoverSummaryRepository : JpaRepository<RoverSummary, String> {
+	fun findByIdNameAndIdPlateauId(name: String, plateauId: String) : List<RoverSummary>
+	
+	fun findByIdPlateauId(plateauId: String) : List<RoverSummary>
+}
 
 
 
