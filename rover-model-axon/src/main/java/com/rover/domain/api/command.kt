@@ -13,6 +13,11 @@ data class PlateauInitializeCmd(@TargetAggregateIdentifier val id: UUID, val wid
 
 data class PlateauDesactivateCmd(@TargetAggregateIdentifier val id: UUID) : DomainCommand
 
+data class PlateauMarkLocationsCmd(
+	@TargetAggregateIdentifier val id: UUID, val position: TwoDimensionalCoordinates,
+	val oldPosition: TwoDimensionalCoordinates
+) : DomainCommand
+
 data class RoverInitializeCmd(
 	@TargetAggregateIdentifier val id: RoverIdentifier,
 	val position: TwoDimensionalCoordinates,
@@ -23,6 +28,10 @@ data class RoverMoveCmd(
 	@TargetAggregateIdentifier val id: RoverIdentifier,
 	val orientation: Orientation,
 	val steps: Int
+) : DomainCommand
+
+data class RoverRemoveCmd(
+	@TargetAggregateIdentifier val id: RoverIdentifier
 ) : DomainCommand
 
 

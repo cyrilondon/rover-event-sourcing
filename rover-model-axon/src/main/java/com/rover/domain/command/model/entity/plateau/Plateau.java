@@ -18,9 +18,12 @@ import com.rover.domain.api.PlateauDesactivateCmd;
 import com.rover.domain.api.PlateauDesactivatedEvt;
 import com.rover.domain.api.PlateauInitializeCmd;
 import com.rover.domain.api.PlateauInitializedEvt;
+import com.rover.domain.api.PlateauMarkLocationsCmd;
+import com.rover.domain.api.PlateauMarkedLocationsEvt;
 import com.rover.domain.command.model.entity.dimensions.TwoDimensionalCoordinates;
 import com.rover.domain.command.model.entity.dimensions.TwoDimensionalSpace;
 import com.rover.domain.command.model.entity.dimensions.TwoDimensions;
+import com.rover.domain.command.model.exception.GameException;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
 
 @Aggregate
@@ -91,6 +94,36 @@ public class Plateau implements TwoDimensionalSpace {
 		// remove rovers
 		resetLocations();
 		logger.debug("Plateau id {} : desactivated with status {}", plateauId, status);
+	}
+
+	@CommandHandler
+	public void handle(PlateauMarkLocationsCmd cmd) {
+		logger.debug("handling {}", cmd);
+		// basic validation
+		ArgumentCheck.preNotNull(cmd.getId(), GameExceptionLabels.MISSING_PLATEAU_UUID);
+		if (locations[cmd.getPosition().getAbscissa()][cmd.getPosition().getOrdinate()] == true) {
+			logger.warn(String.format("A rover already exists at this location %s %s", cmd.getPosition().getAbscissa(),
+					cmd.getPosition().getOrdinate()));
+			throw new GameException(String.format("A rover already exists at this location %s %s",
+					cmd.getPosition().getAbscissa(), cmd.getPosition().getOrdinate()));
+		}
+		// publishing the event
+		apply(new PlateauMarkedLocationsEvt(cmd.getId().toString(), cmd.getPosition(), cmd.getOldPosition()));
+	}
+
+	@EventSourcingHandler
+	public void on(PlateauMarkedLocationsEvt evt) {
+		logger.debug("applying {}", evt);
+		// set the locations marked as busy
+		locations[evt.getPosition().getAbscissa()][evt.getPosition().getOrdinate()] = true;
+		logger.debug("Plateau id {} : locations with abscissa {} and ordinate {} set as busy", evt.getId(),
+				evt.getPosition().getAbscissa(), evt.getPosition().getOrdinate());
+		// we are in Rover move case - and not initialize case
+		if (!(evt.getOldPosition() instanceof TwoDimensionalCoordinates.Empty)) {
+			locations[evt.getOldPosition().getAbscissa()][evt.getOldPosition().getOrdinate()] = false;
+			logger.debug("Plateau id {} : locations with abscissa {} and ordinate {} set as free", evt.getId(),
+					evt.getOldPosition().getAbscissa(), evt.getOldPosition().getOrdinate());
+		}
 	}
 
 	private void initializeLocations() {

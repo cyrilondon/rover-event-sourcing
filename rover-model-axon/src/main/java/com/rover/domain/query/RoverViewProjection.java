@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.rover.domain.api.RoverInitializedEvt;
 import com.rover.domain.api.RoverMovedEvt;
+import com.rover.domain.api.RoverRemovedEvt;
 import com.rover.domain.command.model.entity.rover.RoverIdentifier;
 
 @Component
@@ -55,9 +56,26 @@ public class RoverViewProjection {
 				event.getPosition().getAbscissa(), event.getPosition().getOrdinate()));
 	}
 	
+
+	@EventHandler
+	public void on(RoverRemovedEvt event) {
+		logger.debug("projecting {}", event);
+
+		RoverIdentifier roverId = event.getId();
+		
+		RoverId projectionId = mapToProjectedRoverId(roverId);
+
+		/*
+		 * Update our read model by inserting the new rover. This is done so that
+		 * upcoming regular (non-subscription) queries get correct data.
+		 */
+		
+		repository.delete(new RoverSummary(projectionId));
+		logger.debug("rover id {} has been removed", event.getId().toString());
+	}
+	
 	private RoverId mapToProjectedRoverId(RoverIdentifier roverId) {
-		RoverId projectionId = new RoverId(roverId.getPlateauId().toString(), roverId.getName());
-		return projectionId;
+		return new RoverId(roverId.getPlateauId().toString(), roverId.getName());
 	}
 
 }

@@ -30,13 +30,10 @@ public class RoverController {
 
 	private final RoverCommandMapper roverCommandMapper;
 
-	private final QueryGateway queryGateway;
-
 	public RoverController(RoverService roverService, RoverCommandMapper roverCommandMapper,
 			QueryGateway queryGateway) {
 		this.roverService = roverService;
 		this.roverCommandMapper = roverCommandMapper;
-		this.queryGateway = queryGateway;
 	}
 
 	@PostMapping

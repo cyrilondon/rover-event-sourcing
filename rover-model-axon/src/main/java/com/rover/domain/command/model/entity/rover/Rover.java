@@ -17,6 +17,8 @@ import com.rover.domain.api.RoverInitializeCmd;
 import com.rover.domain.api.RoverInitializedEvt;
 import com.rover.domain.api.RoverMoveCmd;
 import com.rover.domain.api.RoverMovedEvt;
+import com.rover.domain.api.RoverRemoveCmd;
+import com.rover.domain.api.RoverRemovedEvt;
 import com.rover.domain.command.model.entity.dimensions.TwoDimensionalCoordinates;
 import com.rover.domain.command.model.exception.GameExceptionLabels;
 
@@ -80,7 +82,7 @@ public class Rover {
 		TwoDimensionalCoordinates targetPosition = this.position.shiftWithOrientation(cmd.getOrientation(), cmd.getSteps());
 		roverValidator.doValidate(cmd.getId().getPlateauId().toString(), targetPosition.getAbscissa(), targetPosition.getOrdinate());
 		// publishing the event
-		apply(new RoverMovedEvt(cmd.getId(), cmd.getOrientation(), targetPosition));
+		apply(new RoverMovedEvt(cmd.getId(), cmd.getOrientation(), targetPosition, position));
 	}
 
 	@EventSourcingHandler
@@ -91,6 +93,16 @@ public class Rover {
 		logger.debug("Rover id {} moved with new position {} and orientation {}", this.id, this.position,
 				this.orientation);
 	}
+	
+	@CommandHandler
+	public void handle(RoverRemoveCmd cmd) {
+		logger.debug("handling {}", cmd);
+		// basic validation
+		ArgumentCheck.preNotNull(cmd.getId(), GameExceptionLabels.MISSING_ROVER_IDENTIFIER);
+		// publishing the event
+		apply(new RoverRemovedEvt(cmd.getId()));
+	}
+
 
 	public RoverIdentifier getId() {
 		return id;

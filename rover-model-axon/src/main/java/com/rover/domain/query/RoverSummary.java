@@ -25,6 +25,10 @@ public class RoverSummary {
 		this.abscissa = abscissa;
 		this.ordinate = ordinate;
 	}
+	
+	public RoverSummary(RoverId id) {
+		this.id = id;
+	}
 
 	public String getPlateauId() {
 		return getId().getPlateauId();

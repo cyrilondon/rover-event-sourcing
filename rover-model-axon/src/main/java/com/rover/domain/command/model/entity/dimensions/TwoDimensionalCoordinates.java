@@ -83,5 +83,13 @@ public class TwoDimensionalCoordinates {
 	public String toString() {
 		return String.format("Coordinates [abscissa = %s, ordinate = %s]", getAbscissa(), getOrdinate());
 	}
+	
+	public static class Empty extends TwoDimensionalCoordinates {
+
+		public Empty() {
+			super(0, 0);
+		}
+		
+	}
 
 }
