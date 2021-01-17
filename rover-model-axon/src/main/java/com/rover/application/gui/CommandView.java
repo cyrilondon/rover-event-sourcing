@@ -61,8 +61,10 @@ public class CommandView extends VerticalLayout {
 	private static final String DIV_CMD_CLASSNAME = "command-panel";
 
 	private static final String BROADCAST_ROVER_CREATION_MSG = "<BroadCastCreateEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastCreateEvt>";
-	
+
 	private static final String BROADCAST_ROVER_MOVED_MSG = "<BroadCastMovedEvt><name>%s</name><plateauId>%s</plateauId><abscissa>%s</abscissa><ordinate>%s</ordinate></BroadCastMovedEvt>";
+
+	private static final String BROADCAST_ROVER_REMOVED_MSG = "<BroadCastRemovedEvt><name>%s</name><plateauId>%s</plateauId></BroadCastRemovedEvt>";
 
 	private final PlateauService plateauService;
 
@@ -294,16 +296,32 @@ public class CommandView extends VerticalLayout {
 		// handle the result of CompletableFuture
 		try {
 			CompletableFuture<String> finalResult = handleResult(result,
-					String.format("Rover id [%s] successfully moved to new position with [%s] steps forward",
+					String.format(
+							"Command to move Rover id [%s] to new position with [%s] steps forward successfully sent!",
 							cmd.getId(), cmd.getSteps()),
 					"Aggregate Rover could not be moved: %s", false);
 			// send a rover broadcast messages to listening UIs for reactive update (in this
 			// case, it will add a Bubble in the Charts View)
 			if (finalResult.get().equals(SUCCESS)) {
+				String broadCastEvent= null;
+				Thread.sleep(2000);
 				RoverSummary rover = roverService.findRoverById(cmd.getId().getName(),
 						cmd.getId().getPlateauId().toString());
-				String broadCastEvent = String.format(BROADCAST_ROVER_MOVED_MSG, rover.getName(),
-						rover.getPlateauId(), rover.getAbscissa(), rover.getOrdinate());
+				// rover has been deleted by Saga because the plateau is not free at the new
+				// position
+				if (rover == null) {
+					logger.warn(String.format("Rover id [%s] not found", cmd.getId()));
+					showErrorNotification(
+							"Rover id [%s] has been deleted as it was placed on an already occupied position");
+					broadCastEvent = String.format(BROADCAST_ROVER_REMOVED_MSG, cmd.getId().getName(),
+							cmd.getId().getPlateauId().toString());
+
+				} else {
+					logger.debug(String.format("Rover id [%s] found, broadcasting messages to other views", cmd.getId()));
+					broadCastEvent = String.format(BROADCAST_ROVER_MOVED_MSG, rover.getName(),
+							rover.getPlateauId(), rover.getAbscissa(), rover.getOrdinate());
+
+				}
 				// sends the message for reactive update of chart view
 				BroadCaster.broadcast(broadCastEvent);
 			}

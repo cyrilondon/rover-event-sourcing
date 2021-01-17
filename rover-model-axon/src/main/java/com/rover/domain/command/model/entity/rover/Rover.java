@@ -35,12 +35,13 @@ public class Rover {
 	private Orientation orientation;
 
 	private TwoDimensionalCoordinates position;
+	
+	private boolean deleted;
 
 	public Rover() {
 		// Required by Axon
 		logger.debug("Empty constructor invoked");
 		roverValidator = SpringGameContext.getBean(RoverValidator.class);
-
 	}
 
 	@CommandHandler
@@ -78,13 +79,31 @@ public class Rover {
 		ArgumentCheck.preNotNull(cmd.getId(), GameExceptionLabels.MISSING_ROVER_IDENTIFIER);
 		ArgumentCheck.preNotNull(cmd.getSteps(), GameExceptionLabels.MISSING_ROVER_POSITION);
 		ArgumentCheck.preNotNull(cmd.getOrientation(), GameExceptionLabels.MISSING_ROVER_ORIENTATION);
+		ArgumentCheck.requiresFalse(isDeleted(), String.format(GameExceptionLabels.ROVER_ALREADY_DELETED, cmd.getId().toString()));
 		// business validation
 		TwoDimensionalCoordinates targetPosition = this.position.shiftWithOrientation(cmd.getOrientation(), cmd.getSteps());
 		roverValidator.doValidate(cmd.getId().getPlateauId().toString(), targetPosition.getAbscissa(), targetPosition.getOrdinate());
 		// publishing the event
 		apply(new RoverMovedEvt(cmd.getId(), cmd.getOrientation(), targetPosition, position));
 	}
+	
+	@CommandHandler
+	public void handle(RoverRemoveCmd cmd) {
+		logger.debug("handling {}", cmd);
+		// basic validation
+		ArgumentCheck.preNotNull(cmd.getId(), String.format(GameExceptionLabels.MISSING_ROVER_IDENTIFIER, cmd.getId().toString()));
+		// publishing the event
+		apply(new RoverRemovedEvt(cmd.getId()));
+	}
+	
+	@EventSourcingHandler
+	public void on(RoverRemovedEvt evt) {
+		logger.debug("applying {}", evt);
+		this.setDeleted(true);
+		logger.debug("Aggregate Rover id {} marked as deleted", this.id);
+	}
 
+	
 	@EventSourcingHandler
 	public void on(RoverMovedEvt evt) {
 		logger.debug("applying {}", evt);
@@ -93,16 +112,6 @@ public class Rover {
 		logger.debug("Rover id {} moved with new position {} and orientation {}", this.id, this.position,
 				this.orientation);
 	}
-	
-	@CommandHandler
-	public void handle(RoverRemoveCmd cmd) {
-		logger.debug("handling {}", cmd);
-		// basic validation
-		ArgumentCheck.preNotNull(cmd.getId(), GameExceptionLabels.MISSING_ROVER_IDENTIFIER);
-		// publishing the event
-		apply(new RoverRemovedEvt(cmd.getId()));
-	}
-
 
 	public RoverIdentifier getId() {
 		return id;
@@ -116,4 +125,11 @@ public class Rover {
 		return position;
 	}
 
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 }

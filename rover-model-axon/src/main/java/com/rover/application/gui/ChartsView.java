@@ -25,6 +25,7 @@ import com.rover.application.gui.broadcaster.BroadCaster;
 import com.rover.core.util.SerializeUtils;
 import com.rover.core.util.Utils;
 import com.rover.domain.command.model.entity.rover.RoverInitializedBroadCastEventDto;
+import com.rover.domain.command.model.entity.rover.RoverRemovedEventDto;
 import com.rover.domain.command.model.service.plateau.PlateauService;
 import com.rover.domain.command.model.service.rover.RoverService;
 import com.rover.domain.query.PlateauSummary;
@@ -63,8 +64,7 @@ public class ChartsView extends VerticalLayout {
 
 	private final Map<String, Map<String, Series<Double[]>>> plateauToSeries = new HashMap<>();
 
-	public ChartsView(PlateauService plateauService, RoverService roverService)
-			throws Exception {
+	public ChartsView(PlateauService plateauService, RoverService roverService) throws Exception {
 		this.roverService = roverService;
 		this.plateauService = plateauService;
 		setId("charts-view");
@@ -137,14 +137,15 @@ public class ChartsView extends VerticalLayout {
 				new Double[] { Double.valueOf(rover.getAbscissa()), Double.valueOf(rover.getOrdinate()), 30.0 },
 				new Double[] { Double.valueOf(rover.getAbscissa()), Double.valueOf(rover.getOrdinate()), 0.0 });
 	}
-	
+
 	private Series<Double[]> toSeries(RoverInitializedBroadCastEventDto broadCastMsgDto) {
 		return new Series<Double[]>(broadCastMsgDto.getName(),
-				new Double[] { Double.valueOf(broadCastMsgDto.getAbscissa()), Double.valueOf(broadCastMsgDto.getOrdinate()), 30.0 },
-				new Double[] { Double.valueOf(broadCastMsgDto.getAbscissa()), Double.valueOf(broadCastMsgDto.getOrdinate()), 0.0 });
+				new Double[] { Double.valueOf(broadCastMsgDto.getAbscissa()),
+						Double.valueOf(broadCastMsgDto.getOrdinate()), 30.0 },
+				new Double[] { Double.valueOf(broadCastMsgDto.getAbscissa()),
+						Double.valueOf(broadCastMsgDto.getOrdinate()), 0.0 });
 	}
-	
-	
+
 	/**
 	 * attach an event listener for message broadcasting when adding/moving a rover
 	 */
@@ -186,6 +187,20 @@ public class ChartsView extends VerticalLayout {
 					// show notification of new bubble
 					Notification.show(String.format("A rover has just been moved %s", roverMoved), 3000,
 							Position.TOP_CENTER);
+				} else if (newMessage.contains("Remove")) {
+					RoverRemovedEventDto dto = SerializeUtils.readFromRemoveBroadCast(newMessage);
+					String plateauId = dto.getPlateauId();
+					Map<String, Series<Double[]>> roverToSeries = plateauToSeries.get(plateauId);
+					roverToSeries.remove(dto.getName());
+					List<Series<Double[]>> series = roverToSeries.values().stream()
+							.sorted((s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName()))
+							.collect(Collectors.toList());
+					ApexCharts bubbleChart = plateauToChart.get(plateauId);
+					bubbleChart.updateSeries(series.toArray(new Series[series.size()]));
+
+					// show notification of new bubble
+					Notification.show(String.format("The rover [%s] has just been removed", dto.getName()), 3000,
+							Position.TOP_CENTER);
 
 				} else {
 
@@ -208,6 +223,7 @@ public class ChartsView extends VerticalLayout {
 
 			});
 		});
+
 	}
 
 	@Override

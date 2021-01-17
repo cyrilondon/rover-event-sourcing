@@ -22,6 +22,14 @@ public class ArgumentCheck {
 		return object;
 	}
 	
+	public static void requiresTrue(final Boolean object, final String message) {
+		if (object == Boolean.FALSE) throw new IllegalArgumentGameException(message);
+	}
+	
+	public static void requiresFalse(final Boolean object, final String message) {
+		if (object == Boolean.TRUE) throw new IllegalArgumentGameException(message);
+	}
+	
 	public static String preNotEmpty(final String string, final String message) {
 		return requiresNotEmpty(string, String.format(GameExceptionLabels.PRE_CHECK_ERROR_MESSAGE, message));
 	}

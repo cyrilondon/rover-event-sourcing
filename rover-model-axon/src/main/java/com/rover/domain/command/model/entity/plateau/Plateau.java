@@ -104,6 +104,12 @@ public class Plateau implements TwoDimensionalSpace {
 		if (locations[cmd.getPosition().getAbscissa()][cmd.getPosition().getOrdinate()] == true) {
 			logger.warn(String.format("A rover already exists at this location %s %s", cmd.getPosition().getAbscissa(),
 					cmd.getPosition().getOrdinate()));
+			// we are in Rover move case - and not initialize case
+			if (!(cmd.getOldPosition() instanceof TwoDimensionalCoordinates.Empty)) {
+				locations[cmd.getOldPosition().getAbscissa()][cmd.getOldPosition().getOrdinate()] = false;
+				logger.debug("Plateau id {} : locations with abscissa {} and ordinate {} set as free", cmd.getId(),
+						cmd.getOldPosition().getAbscissa(), cmd.getOldPosition().getOrdinate());
+			}
 			throw new GameException(String.format("A rover already exists at this location %s %s",
 					cmd.getPosition().getAbscissa(), cmd.getPosition().getOrdinate()));
 		}

@@ -52,5 +52,7 @@ public class GameExceptionLabels {
 	public static final String ROVER_X_OUT_OF_PLATEAU = "Rover with X-position [%d] is out of the Plateau with width [%d]";
 	
 	public static final String ROVER_Y_OUT_OF_PLATEAU = "Rover with Y-position [%d] is out of the Plateau with height [%d]";
+	
+	public static final String ROVER_ALREADY_DELETED = "Rover with id [%s] has already been deleted";
 
 }

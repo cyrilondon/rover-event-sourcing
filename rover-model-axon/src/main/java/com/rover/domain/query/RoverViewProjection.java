@@ -64,11 +64,6 @@ public class RoverViewProjection {
 		RoverIdentifier roverId = event.getId();
 		
 		RoverId projectionId = mapToProjectedRoverId(roverId);
-
-		/*
-		 * Update our read model by inserting the new rover. This is done so that
-		 * upcoming regular (non-subscription) queries get correct data.
-		 */
 		
 		repository.delete(new RoverSummary(projectionId));
 		logger.debug("rover id {} has been removed", event.getId().toString());

@@ -11,6 +11,7 @@ import org.xml.sax.InputSource;
 
 import com.rover.domain.command.model.entity.plateau.PlateauDto;
 import com.rover.domain.command.model.entity.rover.RoverInitializedBroadCastEventDto;
+import com.rover.domain.command.model.entity.rover.RoverRemovedEventDto;
 import com.rover.domain.command.model.exception.IllegalArgumentGameException;
 
 public class SerializeUtils {
@@ -36,7 +37,18 @@ public class SerializeUtils {
 			return new RoverInitializedBroadCastEventDto(nodes.item(0).getTextContent(), nodes.item(1).getTextContent(), Integer.valueOf(nodes.item(2).getTextContent()),
 					Integer.valueOf(nodes.item(3).getTextContent()));
 		} catch (XPathExpressionException e) {
-			throw new IllegalArgumentGameException("Unable to deserialize the Rover broadcast event binary format");
+			throw new IllegalArgumentGameException("Unable to deserialize the Rover intialize broadcast event binary format");
+		}
+
+	}
+	
+	public static RoverRemovedEventDto readFromRemoveBroadCast(String payload) {
+		InputSource is = new InputSource(new StringReader(payload));
+		try {
+			NodeList nodes = (NodeList) xpf.newXPath().evaluate("/*/*", is, XPathConstants.NODESET);
+			return new RoverRemovedEventDto(nodes.item(0).getTextContent(), nodes.item(1).getTextContent());
+		} catch (XPathExpressionException e) {
+			throw new IllegalArgumentGameException("Unable to deserialize the Rover removal broadcast event binary format");
 		}
 
 	}
